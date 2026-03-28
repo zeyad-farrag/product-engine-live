@@ -1,6 +1,6 @@
 # Analysis Templates — Demand Signal Mining
 
-> **Database**: `system_travelapp` on `66.175.216.130`. Connection via pymysql (direct, SSL disabled).
+> **Database**: `system_travelapp` (host configured via `MYSQL_HOST` env var). Connection via pymysql.
 
 Use these templates for each of the six analysis types. Populate all tables with real data from database queries. Skip any analysis where the required data is unavailable — note the gap, do not fabricate values.
 

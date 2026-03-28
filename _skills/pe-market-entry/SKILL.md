@@ -11,12 +11,14 @@ description: >
   persona cards, competitor benchmarks, and decision record. Three-outcome
   framework: ENTER / MONITOR / REJECT. Persists all artifacts to GitHub repo.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: initiative
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-market-entry — Market Entry Evaluation
 
@@ -32,12 +34,12 @@ Before any phase begins, scan the GitHub repo in parallel:
 
 ```bash
 # Run all in parallel
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/market-assessments --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/market-assessments --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 ```
 
 ### Index-Accelerated Lookup
@@ -47,7 +49,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -121,7 +123,7 @@ INFLECTION POINT 0: Confirm Scope — Shall we begin Discovery?
 Run all five streams and present findings cohesively. See `references/discovery-streams.md` for detailed templates.
 
 ### Stream 2A — Internal Demand Signal Mining (MySQL)
-Query the company's booking, traffic, and cancellation databases via pymysql direct connection. Disclose if data is unavailable.
+Query the company's booking, traffic, and cancellation databases via pymysql direct connection using environment variables (`MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_SSL`). Disclose if data is unavailable.
 Key metrics: 24-month booking trend, destination breakdown, product type mix, avg booking value, lead time, group size, seasonality, traffic from target market, amendment rates.
 
 ### Stream 2B — External Market Intelligence (Web Search)
@@ -207,6 +209,8 @@ For each strategy, rate risks: likelihood (H/M/L) × impact (H/M/L). See `refere
 ### 3.3 Resource Requirements
 Summarize what each strategy demands in terms of people, budget, tech, and partnerships.
 
+> *Note: IP2 (mid-discovery reclassification) is an internal system inflection point defined in the master document and is not surfaced as a user-facing checkpoint in this skill.*
+
 ### INFLECTION POINT 3: Are We Committed to This Entry Strategy?
 
 ```
@@ -256,27 +260,27 @@ Use `api_credentials=["github"]` for all GitHub operations.
 
 ```bash
 # Market assessment
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/market-assessments/[market]-[YYYY-MM-DD].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/market-assessments/[market]-[YYYY-MM-DD].md \
   --method PUT --field message="Product Engine: Market Assessment — [market]" \
   --field content="$(base64 -w0 <<< '[content]')"
 
 # One file per persona
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas/[persona-name].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas/[persona-name].md \
   --method PUT --field message="Product Engine: Persona — [name] ([market])" \
   --field content="$(base64 -w0 <<< '[content]')"
 
 # One file per competitor
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors/[competitor]-[market].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors/[competitor]-[market].md \
   --method PUT --field message="Product Engine: Competitor — [name] ([market])" \
   --field content="$(base64 -w0 <<< '[content]')"
 
 # Decision record
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records/market-entry-[market]-[YYYY-MM-DD].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records/market-entry-[market]-[YYYY-MM-DD].md \
   --method PUT --field message="Product Engine: Decision Record — Market Entry [market]" \
   --field content="$(base64 -w0 <<< '[content]')"
 
 # Initiative state → move from active/ to closed/ if applicable
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/[active|closed]/market-entry-[market].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/[active|closed]/market-entry-[market].md \
   --method PUT --field message="Product Engine: Initiative — Market Entry [market] [status]" \
   --field content="$(base64 -w0 <<< '[content]')"
 ```
@@ -324,11 +328,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

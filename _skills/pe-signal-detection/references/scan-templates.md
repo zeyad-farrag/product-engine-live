@@ -10,7 +10,7 @@ This file contains:
 
 ## MySQL Queries
 
-> **Database**: `system_travelapp` on `66.175.216.130`. Connection via pymysql (direct, SSL disabled). All queries use the real schema.
+> **Database**: `system_travelapp` (host configured via `MYSQL_HOST` env var). Connection via pymysql. All queries use the real schema.
 
 ### Sub-Scan 1.1 — Booking Velocity Scan
 

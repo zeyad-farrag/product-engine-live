@@ -108,7 +108,7 @@
 | Field | Details |
 |---|---|
 | **Inputs** | Complete report body (Step 1 manifest + Step 2 analyses + Step 3 synthesis); frontmatter values: `initiatives_analyzed`, `artifacts_analyzed`, `persona_archetypes_found`, `multi_market_competitors`, `systemic_issues`, `top_insight` |
-| **Outputs** | `intelligence/cross-initiative-patterns/YYYY-MM-DD.md` (committed to GitHub via local clone at `/tmp/product-engine-live`); all prior cross-initiative-patterns reports updated to `status: superseded` via GitHub API; `intelligence/_index/` index row added/updated; Perplexity memory pointer |
+| **Outputs** | `intelligence/cross-initiative-patterns/YYYY-MM-DD.md` (committed to GitHub via `gh api` PUT); all prior cross-initiative-patterns reports updated to `status: superseded` via `gh api` PUT; `intelligence/_index/` index row added/updated via `gh api` PUT; Perplexity memory pointer |
 | **Feeds Into** | Future cross-initiative-patterns runs (Step 1 — prior report for comparison); pe-portfolio-health Step 0; pe-signal-detection Step 0 |
 
 ---
@@ -165,4 +165,4 @@ Step 1: Complete Memory Retrieval
 | Artifact | Path Pattern | Frontmatter Type | Depends On |
 |---|---|---|---|
 | Cross-Initiative Patterns Report | `intelligence/cross-initiative-patterns/YYYY-MM-DD.md` | `cross-initiative-patterns` | personas, competitors, demand-signals, health-checks, gap-analyses, decision-records, market-assessments, initiatives (active + closed), portfolio-health reports, signal-detection reports |
-| Intelligence Index (cross-initiative-patterns) | `intelligence/_index/cross-initiative-patterns.md` | index | Cross-Initiative Patterns Report |
+| Intelligence Index (cross-initiative-patterns) | `intelligence/_index/intelligence-reports.md` | index | Cross-Initiative Patterns Report |

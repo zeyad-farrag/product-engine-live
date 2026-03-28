@@ -1,16 +1,16 @@
 ---
 name: pe-competitor-benchmarking
 description: >
-  Product Engine capability skill for competitor analysis, competitive benchmarking, and competitive intelligence. Use when asked to map the competitive landscape, profile competitors, run a competitive analysis, build a benchmark matrix, identify competitive gaps, assess competitive threats, or answer "who competes with us for [context]?". Triggers: "competitor analysis", "competitive benchmarking", "competitive landscape", "competitive intelligence", "benchmark competitors", "who are our competitors", "profile a competitor", "competitive gaps", "competitive threats", "benchmark matrix", "competitive positioning", "who competes with us", "map competition". Operates within the Product Engine system for Memphis Tours, storing all outputs to the GitHub repo zeyad-farrag/product-engine-live under artifacts/competitors/.
+  Product Engine capability skill for competitor analysis, competitive benchmarking, and competitive intelligence. Use when asked to map the competitive landscape, profile competitors, run a competitive analysis, build a benchmark matrix, identify competitive gaps, assess competitive threats, or answer "who competes with us for [context]?". Triggers: "competitor analysis", "competitive benchmarking", "competitive landscape", "competitive intelligence", "benchmark competitors", "who are our competitors", "profile a competitor", "competitive gaps", "competitive threats", "benchmark matrix", "competitive positioning", "who competes with us", "map competition". Operates within the Product Engine system for Memphis Tours, storing all outputs to the GitHub repo zeyad-farrag/Product-Engine under artifacts/competitors/.
 metadata:
   author: Product Engine
   version: '1.0'
   layer: capability
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-competitor-benchmarking: Competitor Benchmarking
 
@@ -42,14 +42,14 @@ You don't just list competitors — you analyze positioning, identify differenti
 
 ## Step 0: Repo Setup
 
-Before any other action, ensure the product-engine-live repo is available locally:
+Before any other action, ensure the Product-Engine repo is available locally:
 
 ```bash
 cd /home/user/workspace
-if [ ! -d "product-engine-live" ]; then
-  gh repo clone zeyad-farrag/product-engine-live
+if [ ! -d "Product-Engine" ]; then
+  gh repo clone zeyad-farrag/Product-Engine
 fi
-cd product-engine-live && git pull origin main
+cd Product-Engine && git pull origin main
 ```
 
 ### Index-Accelerated Lookup
@@ -59,7 +59,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -77,7 +77,7 @@ Before doing any work, run all three checks in parallel.
 ### 1a. Check for existing competitor profiles
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '.[].name'
 ```
 
@@ -86,14 +86,14 @@ gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
 - **Cross-reference check**: If a competitor appears in other market contexts, note the cross-reference (e.g., "TravelCo already has a profile for the French market — will cross-reference."). Check with:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '.[].name' | grep -i "[competitor keyword]"
 ```
 
 ### 1b. Check for foundation context
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains \
   --jq '.[].name'
 ```
 
@@ -115,7 +115,7 @@ Read whichever foundation files are available and extract relevant context befor
 ### 1c. Check for relevant persona cards
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '.[].name'
 ```
 
@@ -209,7 +209,7 @@ Complete all four synthesis sections from `references/benchmark-synthesis.md`:
 1. Create the file locally:
 
 ```bash
-cat > /home/user/workspace/product-engine-live/artifacts/competitors/[kebab-case-name]-[market-context].md << 'EOF'
+cat > /home/user/workspace/Product-Engine/artifacts/competitors/[kebab-case-name]-[market-context].md << 'EOF'
 ---
 type: competitor-profile
 name: [Competitor Name]
@@ -232,7 +232,7 @@ EOF
 2. Commit and push each profile individually:
 
 ```bash
-cd /home/user/workspace/product-engine-live
+cd /home/user/workspace/Product-Engine
 git add artifacts/competitors/[kebab-case-name]-[market-context].md
 git commit -m "Product Engine: Competitor Profile — [Competitor Name] ([market context])"
 git push origin main
@@ -243,7 +243,7 @@ git push origin main
 Save as a separate file prefixed with underscore (sorts to top of directory):
 
 ```bash
-cat > /home/user/workspace/product-engine-live/artifacts/competitors/_benchmark-[context]-[YYYY-MM-DD].md << 'EOF'
+cat > /home/user/workspace/Product-Engine/artifacts/competitors/_benchmark-[context]-[YYYY-MM-DD].md << 'EOF'
 ---
 type: benchmark-summary
 context: [CONTEXT]
@@ -260,7 +260,7 @@ tags: [searchable tags]
 [full benchmark body here]
 EOF
 
-cd /home/user/workspace/product-engine-live
+cd /home/user/workspace/Product-Engine
 git add artifacts/competitors/_benchmark-[context]-[YYYY-MM-DD].md
 git commit -m "Product Engine: Competitive Benchmark Summary — [CONTEXT]"
 git push origin main
@@ -291,7 +291,7 @@ will build it on first run.
 Before writing any profile, check whether a profile for this competitor already exists in a different market context:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '.[].name' | grep -i "[competitor-name-keyword]"
 ```
 
@@ -306,7 +306,7 @@ If a match exists, add a cross-reference note in the profile header:
 
 After all files are committed to the repo, store a lightweight memory pointer:
 
-> "Remember that competitor profiles for [CONTEXT] are stored in product-engine-live repo under artifacts/competitors/. Profiles: [list names]. Benchmark summary: _benchmark-[context]-[date].md. Created [date]."
+> "Remember that competitor profiles for [CONTEXT] are stored in Product-Engine repo under artifacts/competitors/. Profiles: [list names]. Benchmark summary: _benchmark-[context]-[date].md. Created [date]."
 
 This is the **only** thing stored in Perplexity memory. All structured content lives in the GitHub repo.
 

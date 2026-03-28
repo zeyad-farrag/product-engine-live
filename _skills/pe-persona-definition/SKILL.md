@@ -1,16 +1,16 @@
 ---
 name: pe-persona-definition
 description: >
-  Product Engine capability skill for identifying and profiling buyer personas, traveler profiles, and customer segments. Use when asked to build persona cards, define audience segments, profile a buyer type, describe who buys a product, or answer "who is our customer for [context]?". Triggers: "build persona", "define personas", "who buys", "buyer persona", "audience profile", "traveler profile", "customer segment", "who travels to", "segment our audience", "persona cards". Operates within the Product Engine system for Memphis Tours, storing all outputs to the GitHub repo zeyad-farrag/product-engine-live under artifacts/personas/.
+  Product Engine capability skill for identifying and profiling buyer personas, traveler profiles, and customer segments. Use when asked to build persona cards, define audience segments, profile a buyer type, describe who buys a product, or answer "who is our customer for [context]?". Triggers: "build persona", "define personas", "who buys", "buyer persona", "audience profile", "traveler profile", "customer segment", "who travels to", "segment our audience", "persona cards". Operates within the Product Engine system for Memphis Tours, storing all outputs to the GitHub repo zeyad-farrag/Product-Engine under artifacts/personas/.
 metadata:
   author: Product Engine
   version: '1.0'
   layer: capability
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-persona-definition: Buyer Persona Definition
 
@@ -40,14 +40,14 @@ A good persona is not a demographic profile. It is a decision-making model: HOW 
 
 ## Step 0: Repo Setup
 
-Before any other action, ensure the product-engine-live repo is available locally:
+Before any other action, ensure the Product-Engine repo is available locally:
 
 ```bash
 cd /home/user/workspace
-if [ ! -d "product-engine-live" ]; then
-  gh repo clone zeyad-farrag/product-engine-live
+if [ ! -d "Product-Engine" ]; then
+  gh repo clone zeyad-farrag/Product-Engine
 fi
-cd product-engine-live && git pull origin main
+cd Product-Engine && git pull origin main
 ```
 
 ### Index-Accelerated Lookup
@@ -57,7 +57,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -75,7 +75,7 @@ Before doing any work, run both checks in parallel.
 ### 1a. Check for existing persona cards
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '.[].name'
 ```
 
@@ -85,7 +85,7 @@ gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
 ### 1b. Check for foundation context
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains \
   --jq '.[].name'
 ```
 
@@ -108,14 +108,21 @@ Read whichever foundation files are available and extract relevant context befor
 
 ### 2a. Internal Data Analysis (MySQL)
 
-Database: `system_travelapp` on `66.175.216.130`. Connection via pymysql (direct, SSL disabled).
+Database: `system_travelapp`. Connection via pymysql using environment variables.
 
 ```python
+import os
 import pymysql
 conn = pymysql.connect(
-    host='66.175.216.130', port=3306, user='root', password='Flash2k1',
-    database='system_travelapp', connect_timeout=10, ssl_disabled=True,
-    charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor,
+    host=os.environ.get('MYSQL_HOST'),
+    port=int(os.environ.get('MYSQL_PORT', '3306')),
+    user=os.environ.get('MYSQL_USER'),
+    password=os.environ.get('MYSQL_PASSWORD'),
+    database=os.environ.get('MYSQL_DATABASE', 'system_travelapp'),
+    connect_timeout=10,
+    ssl_disabled=os.environ.get('MYSQL_SSL', 'false').lower() != 'true',
+    charset='utf8mb4',
+    cursorclass=pymysql.cursors.DictCursor,
 )
 ```
 
@@ -280,7 +287,7 @@ After all cards are built, produce the Persona Portfolio Summary using `referenc
 1. Create the file locally:
 
 ```bash
-cat > /home/user/workspace/product-engine-live/artifacts/personas/[kebab-case-name].md << 'EOF'
+cat > /home/user/workspace/Product-Engine/artifacts/personas/[kebab-case-name].md << 'EOF'
 ---
 type: persona-card
 name: [persona name]
@@ -302,7 +309,7 @@ EOF
 2. Commit and push:
 
 ```bash
-cd /home/user/workspace/product-engine-live
+cd /home/user/workspace/Product-Engine
 git add artifacts/personas/[kebab-case-name].md
 git commit -m "Product Engine: Persona Card — [Persona Name]"
 git push origin main
@@ -344,7 +351,7 @@ will build it on first run.
 Before writing, check whether a card for this persona already exists:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '.[].name' | grep -i "[keyword]"
 ```
 
@@ -356,7 +363,7 @@ If a matching card exists, offer to **update** (change `updated` date, revise co
 
 After all cards are committed to the repo, store a lightweight memory pointer:
 
-> "Remember that persona cards for [CONTEXT] are stored in product-engine-live repo under artifacts/personas/. Cards: [list names]. Created [date]."
+> "Remember that persona cards for [CONTEXT] are stored in Product-Engine repo under artifacts/personas/. Cards: [list names]. Created [date]."
 
 This is the **only** thing stored in Perplexity memory. All structured content lives in the GitHub repo.
 

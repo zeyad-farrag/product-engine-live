@@ -137,11 +137,11 @@ Before finalizing the synthesis, check whether competitive gaps or threats ident
 
 ```bash
 # Search for related gap analyses
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses \
   --jq '.[].name'
 
 # Search for related market assessments
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/market-assessments \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/market-assessments \
   --jq '.[].name'
 ```
 

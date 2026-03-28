@@ -11,7 +11,7 @@
 
 ---
 
-## Phase-Level Contracts
+## Step-Level Contracts
 
 ### Phase 0: State Detection
 
@@ -40,7 +40,7 @@
 
 | Step | Inputs | Outputs | Feeds Into |
 |---|---|---|---|
-| 2A-1 Product Current State Assessment | Existing `artifacts/health-checks/` < 90 days (reuse if present); otherwise MySQL: booking volume 12–24 month trend (pymysql direct connection to `system_travelapp`); MySQL: source market breakdown (pymysql direct connection to `system_travelapp`); MySQL: customer segment breakdown (pymysql direct connection to `system_travelapp`); MySQL: conversion metrics and funnel (pymysql direct connection to `system_travelapp`); MySQL: amendment and cancellation patterns (pymysql direct connection to `system_travelapp`); MySQL: seasonal patterns (pymysql direct connection to `system_travelapp`) | Product current state report: booking trend, source market mix, segment mix, conversion funnel, amendment patterns, seasonality; reuse flag if health-check leveraged | 2A-2 Structural Analysis; IP1 Confidence |
+| 2A-1 Product Current State Assessment | Existing `artifacts/health-checks/` < 90 days (reuse if present); otherwise MySQL: booking volume 12–24 month trend (pymysql direct connection to `system_travelapp` via env vars); MySQL: source market breakdown (pymysql direct connection to `system_travelapp` via env vars); MySQL: customer segment breakdown (pymysql direct connection to `system_travelapp` via env vars); MySQL: conversion metrics and funnel (pymysql direct connection to `system_travelapp` via env vars); MySQL: amendment and cancellation patterns (pymysql direct connection to `system_travelapp` via env vars); MySQL: seasonal patterns (pymysql direct connection to `system_travelapp` via env vars) | Product current state report: booking trend, source market mix, segment mix, conversion funnel, amendment patterns, seasonality; reuse flag if health-check leveraged | 2A-2 Structural Analysis; IP1 Confidence |
 | 2A-2 Product Structural Analysis | 2A-1 findings; `references/gap-analysis-framework.md` adaptability ratings | Product Structural Analysis table (9 components × Current State / Adaptability HIGH/MED/LOW / Change Effort MINOR/MOD/MAJOR / Notes): Destination/Itinerary, Accommodation, Activities, Transport, Duration, Price Point, Messaging/Positioning, Content/Language, Booking Flow | 2C Gap Analysis |
 
 #### Track B — Understand the New Audience
@@ -49,7 +49,7 @@
 |---|---|---|---|
 | 2B-1 Audience Intelligence | Web search: outbound travel market size for new audience source market; Web search: travel behaviour patterns (booking lead time, trip duration, spend patterns); Web search: distribution channels (OTA, direct, agent, social); Web search: cultural and economic travel factors; Web search + competitor profiling: top 3–5 competitors already serving this audience for this product type | Audience intelligence report with citations; competitor list for new audience with 9-dimension profiles | 2B-2 Persona; 2C Gap Analysis; IP1 |
 | 2B-2 Buyer Persona Discovery | 2B-1 audience intelligence; existing `artifacts/personas/` < 90 days relevant to new audience (reuse if fresh); persona template from `references/repositioning-templates.md` | 2–4 buyer persona profiles for new audience (stored at `artifacts/personas/[name].md`) | 2C Gap Analysis; Phase 4 Persona Cards |
-| 2B-3 Internal Demand Signals | MySQL: existing bookings from new audience geography/segment for this product (pymysql direct connection to `system_travelapp`); MySQL: traffic and inquiry patterns from new audience (pymysql direct connection to `system_travelapp`); MySQL: similar products with crossover to new audience (pymysql direct connection to `system_travelapp`) | Internal demand signal summary: existing bookings, traffic/inquiry patterns, crossover product data | 2C Gap Analysis; IP1 Evidence |
+| 2B-3 Internal Demand Signals | MySQL: existing bookings from new audience geography/segment for this product (pymysql direct connection to `system_travelapp` via env vars); MySQL: traffic and inquiry patterns from new audience (pymysql direct connection to `system_travelapp` via env vars); MySQL: similar products with crossover to new audience (pymysql direct connection to `system_travelapp` via env vars) | Internal demand signal summary: existing bookings, traffic/inquiry patterns, crossover product data | 2C Gap Analysis; IP1 Evidence |
 
 #### Convergence
 
@@ -139,7 +139,7 @@ Phase 2: DISCOVER — Dual-Track
   │ 2A-2 Structural      │  (repo reuse or new)         │
   │  Analysis (9 comps)  │                              │
   │                      │ 2B-3 Internal Demand Signals │
-  │                      │  (MySQL (pymysql direct connection to `system_travelapp`))       │
+  │                      │  (MySQL (pymysql direct connection to `system_travelapp` via env vars))       │
   └──────────┬───────────┴─────────────┬────────────────┘
              │                         │
              └──────────┬──────────────┘

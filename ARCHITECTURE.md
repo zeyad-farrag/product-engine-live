@@ -1,18 +1,15 @@
 # Product Engine — Intelligence Store Architecture
 
-> **Repository**: `zeyad-farrag/product-engine-live` (production)
-> **Staging**: `zeyad-farrag/Product-Engine`
-
 ## Overview
 
-Product Engine uses this GitHub repository as its structured intelligence store. Every artifact the system produces — persona cards, competitor profiles, market assessments, decision records — is stored as a markdown file with YAML frontmatter metadata.
+Product Engine uses a GitHub repository as its structured intelligence store. Every artifact the system produces — persona cards, competitor profiles, market assessments, decision records — is stored as a markdown file with YAML frontmatter metadata.
 
 Perplexity Computer's persistent memory is used only for lightweight session context and pointers. All structured, retrievable intelligence lives in this repo.
 
 ## Repository Structure
 
 ```
-product-engine-live/
+Product-Engine/
 ├── _prompts/                    ← Original prompt archive (reference only)
 ├── _skills/                     ← Skill files
 ├── foundation/                  ← Foundation Session outputs
@@ -239,13 +236,13 @@ Pattern: `[subject]-[context]-[date-if-versioned].md`
 ### Reading artifacts
 ```bash
 # Read a specific artifact
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas/german-leisure-traveler.md
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas/german-leisure-traveler.md
 
 # List all persona cards
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas
 
 # Search across artifacts by content
-gh search code "market: Germany" --repo zeyad-farrag/product-engine-live
+gh search code "market: Germany" --repo zeyad-farrag/Product-Engine
 ```
 
 ### Writing artifacts
@@ -323,6 +320,12 @@ Two staleness triggers:
 - **Dependency-based**: Artifacts whose `depends_on` entries have been updated more recently than the artifact itself
 
 Dependency staleness is more precise than time-based — a 30-day-old gap analysis is stale if the persona card it was built from was refreshed yesterday.
+
+## Perplexity Computer Installation Status
+
+All 16 pe-* skills are installed as custom skills on Perplexity Computer. Users invoke skills by name (e.g., "run pe-foundation-session", "competitor benchmarking for Germany"). The skill definitions in `_skills/` are the source of truth — Perplexity Computer reads them directly from this repository.
+
+See `_skills/INSTALLATION_STATUS.md` for the full skill inventory with installation status.
 
 ## Perplexity Memory (Lightweight Pointers Only)
 

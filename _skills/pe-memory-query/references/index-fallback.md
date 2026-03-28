@@ -17,81 +17,81 @@ All commands use `api_credentials=["github"]` with the `gh` CLI.
 
 ```bash
 # List all persona files
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
 # Read a specific persona file (repeat for each)
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas/[filename].md \
   --jq '.content' | base64 -d
 ```
 
 ### Competitors
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors/[filename].md \
   --jq '.content' | base64 -d
 ```
 
 ### Demand Signals
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/demand-signals \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/demand-signals/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals/[filename].md \
   --jq '.content' | base64 -d
 ```
 
 ### Health Checks
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks/[filename].md \
   --jq '.content' | base64 -d
 ```
 
 ### Gap Analyses
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses/[filename].md \
   --jq '.content' | base64 -d
 ```
 
 ### Market Assessments
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/market-assessments \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/market-assessments \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/market-assessments/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/market-assessments/[filename].md \
   --jq '.content' | base64 -d
 ```
 
 ### Decision Records
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records/[filename].md \
   --jq '.content' | base64 -d
 ```
 
 ### Initiatives
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/[filename].md \
   --jq '.content' | base64 -d
 ```
 
@@ -101,27 +101,27 @@ Intelligence reports may be organized in subdirectories by type:
 
 ```bash
 # Top-level listing
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
 # Check for subdirectories (portfolio-health, signal-detection, cross-initiative-patterns)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/portfolio-health \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/portfolio-health \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/signal-detection \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/cross-initiative-patterns \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-initiative-patterns \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 ```
 
 ### Foundation
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/[filename].md \
   --jq '.content' | base64 -d
 ```
 
@@ -136,7 +136,7 @@ for dir in artifacts/personas artifacts/competitors artifacts/demand-signals \
             artifacts/health-checks artifacts/gap-analyses artifacts/market-assessments \
             artifacts/decision-records initiatives intelligence foundation; do
   echo "=== $dir ===" && \
-  gh api "repos/zeyad-farrag/product-engine-live/contents/${dir}" \
+  gh api "repos/zeyad-farrag/Product-Engine/contents/${dir}" \
     --jq '[.[] | select(.type=="file") | .path]' 2>/dev/null || echo "[]"
 done
 ```

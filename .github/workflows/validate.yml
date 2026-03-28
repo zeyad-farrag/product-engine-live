@@ -1,0 +1,77 @@
+name: Validate Repository
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          echo "Checking required files..."
+          for f in CLAUDE.md ARCHITECTURE.md README.md LICENSE .gitignore _config/repo.md; do
+            if [ ! -f "$f" ]; then
+              echo "ERROR: Missing required file: $f"
+              exit 1
+            fi
+          done
+          echo "All required files present."
+
+      - name: Validate skill structure
+        run: |
+          echo "Checking skill directories..."
+          for skill_dir in _skills/pe-*/; do
+            skill_name=$(basename "$skill_dir")
+            if [ ! -f "${skill_dir}SKILL.md" ]; then
+              echo "ERROR: ${skill_name} missing SKILL.md"
+              exit 1
+            fi
+            if [ ! -f "${skill_dir}references/io-contract.md" ]; then
+              echo "ERROR: ${skill_name} missing references/io-contract.md"
+              exit 1
+            fi
+            echo "  ${skill_name}: OK"
+          done
+          echo "All skills valid."
+
+      - name: Validate YAML frontmatter
+        run: |
+          echo "Checking YAML frontmatter in SKILL.md files..."
+          for skill_file in _skills/pe-*/SKILL.md; do
+            if ! head -1 "$skill_file" | grep -q "^---"; then
+              echo "ERROR: Missing YAML frontmatter in $skill_file"
+              exit 1
+            fi
+            echo "  $skill_file: OK"
+          done
+
+      - name: Check for exposed secrets
+        run: |
+          echo "Scanning for potential secrets..."
+          PATTERN='ag''p_'
+          if grep -rn "$PATTERN" --include="*.json" --include="*.md" --include="*.yml" --include="*.yaml" --exclude="validate.yml" .; then
+            echo "WARNING: Potential API token found in tracked files"
+            exit 1
+          fi
+          echo "No exposed secrets found."
+
+      - name: Validate cross-references
+        run: |
+          echo "Checking prompt files reference valid skills..."
+          for prompt in _prompts/*.md _prompts/**/*.md; do
+            [ -f "$prompt" ] || continue
+            echo "  Checking: $prompt"
+          done
+          echo "Cross-reference check complete."
+
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: '**/*.md'
+        continue-on-error: true

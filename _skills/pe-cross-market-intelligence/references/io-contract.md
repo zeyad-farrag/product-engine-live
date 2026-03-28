@@ -4,10 +4,10 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | GitHub repo `zeyad-farrag/product-engine-live` accessible; at least 2 distinct markets or contexts with existing artifacts |
+| **Required Inputs** | GitHub repo `zeyad-farrag/Product-Engine` accessible; at least 2 distinct markets or contexts with existing artifacts |
 | **Optional Inputs** | User-specified [COMPARISON_SCOPE] (defaults to all active artifacts); `foundation/business-model-summary.md`; `foundation/domains/11-strategic-priorities.md`; existing cross-market reports in `intelligence/cross-market-intelligence/` |
 | **Produces** | Cross-market intelligence report at `intelligence/cross-market-intelligence/[scope-kebab]-[date].md` |
-| **Updates** | `intelligence/_index/[cross-market-index].md` |
+| **Updates** | `intelligence/_index/intelligence-reports.md` |
 
 ---
 
@@ -99,8 +99,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | All analysis outputs from Phase 2; strategic synthesis from Phase 3; `intelligence/_index/[cross-market-index].md` (current index) |
-| **Outputs** | `intelligence/cross-market-intelligence/[scope-kebab]-[date].md` with YAML frontmatter (type, scope, markets_compared, artifacts_analyzed, confidence, status, supersedes, depends_on, tags); updated `intelligence/_index/[cross-market-index].md`; Perplexity memory pointer (path + artifact count + top insight + systemic gap count) + tagged individual findings (patterns, archetypes, systemic gaps) |
+| **Inputs** | All analysis outputs from Phase 2; strategic synthesis from Phase 3; `intelligence/_index/intelligence-reports.md` (current index) |
+| **Outputs** | `intelligence/cross-market-intelligence/[scope-kebab]-[date].md` with YAML frontmatter (type, scope, markets_compared, artifacts_analyzed, confidence, status, supersedes, depends_on, tags); updated `intelligence/_index/intelligence-reports.md`; Perplexity memory pointer (path + artifact count + top insight + systemic gap count) + tagged individual findings (patterns, archetypes, systemic gaps) |
 | **Feeds Into** | Future cross-market runs (this report becomes the prior baseline); initiative planning (systemic gaps and multi-market patterns inform portfolio strategy) |
 
 ---
@@ -156,4 +156,4 @@ Phase 4: Store the Report
 | Artifact | Path Pattern | Frontmatter Type | Depends On |
 |---|---|---|---|
 | Cross-market intelligence report | `intelligence/cross-market-intelligence/[scope-kebab]-[date].md` | `cross-market-intelligence` | All artifact types in scope: personas, competitors, demand-signals, gap-analyses, health-checks, decision-records; `11-strategic-priorities.md` |
-| Cross-market index | `intelligence/_index/[cross-market-index].md` | _(index table)_ | All cross-market intelligence reports |
+| Cross-market index | `intelligence/_index/intelligence-reports.md` | _(index table)_ | All cross-market intelligence reports |

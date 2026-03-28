@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: product-engine-dashboard
+    runtime: node
+    buildCommand: cd dashboard && npm ci && npm run build
+    startCommand: cd dashboard && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: PORT
+        value: "5000"
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+  - type: worker
+    name: product-engine-mysql-api
+    runtime: python
+    buildCommand: pip install pymysql fastapi uvicorn python-dateutil
+    startCommand: cd dashboard/server && uvicorn mysql-api:app --host 0.0.0.0 --port 8001
+    envVars:
+      - key: PORT
+        value: "8001"
+    autoDeploy: true

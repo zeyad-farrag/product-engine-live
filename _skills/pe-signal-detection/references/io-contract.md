@@ -5,9 +5,9 @@
 | | Details |
 |---|---|
 | **Required Inputs** | At least one artifact type in the repo (health-checks, demand-signals, decision-records, signal-detection reports, initiatives, or portfolio-health) |
-| **Optional Inputs** | `foundation/business-model-summary.md`, `foundation/strategic-priorities.md` (business framing); `intelligence/_index/{category}.md` index files (accelerate lookup); prior `intelligence/signal-detection/` reports (enable prediction tracking, signal history, recurring escalation); MySQL database connection (Source 1 — pymysql direct connection to `system_travelapp`) |
+| **Optional Inputs** | `foundation/business-model-summary.md`, `foundation/domains/11-strategic-priorities.md` (business framing); `intelligence/_index/{category}.md` index files (accelerate lookup); prior `intelligence/signal-detection/` reports (enable prediction tracking, signal history, recurring escalation); MySQL database connection (Source 1 — pymysql direct connection via env vars to `system_travelapp`) |
 | **Produces** | `intelligence/signal-detection/YYYY-MM-DD.md` (signal report with classified signal table, CRITICAL/WARNING detail cards, opportunity table, summary dashboard, recommended actions, intelligence freshness report) |
-| **Updates** | `intelligence/_index/` — relevant index file for `signal-detection-report` artifact type; prior signal-detection report frontmatter set to `status: superseded` |
+| **Updates** | `intelligence/_index/` — relevant index file for `intelligence-report` artifact type (report_type: signal-detection); prior signal-detection report frontmatter set to `status: superseded` |
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | `artifacts/health-checks/`, `artifacts/demand-signals/`, `artifacts/decision-records/`, `intelligence/signal-detection/`, `intelligence/portfolio-health/`, `initiatives/active/`; `intelligence/_index/{category}.md` (fast-path); `foundation/business-model-summary.md`, `foundation/strategic-priorities.md` |
+| **Inputs** | `artifacts/health-checks/`, `artifacts/demand-signals/`, `artifacts/decision-records/`, `intelligence/signal-detection/`, `intelligence/portfolio-health/`, `initiatives/active/`; `intelligence/_index/{category}.md` (fast-path); `foundation/business-model-summary.md`, `foundation/domains/11-strategic-priorities.md` |
 | **Outputs** | Intelligence Manifest (counts, newest/oldest dates per artifact type, prior signal report date, foundation load status) |
 | **Feeds Into** | Step 1 (DB scan — determines business context); Step 2 (Memory scan — files to read); Step 3 (Web scan — search topics derived from context); Step 9 (Freshness Report — manifest data reused) |
 
@@ -37,7 +37,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | MySQL database (pymysql direct connection — query templates in `references/scan-templates.md`); 5 sub-scans: booking velocity (current 30d vs. prior 30d, YoY, 90d rolling avg), revenue anomaly (avg booking value, top-10 revenue concentration), cancellation/postponement signals (cancellation rate, postponement rate), conversion signals (request-to-booking rate by destination/source), customer behavior (lead time, destination preference shifts, new market activity) |
+| **Inputs** | MySQL database (pymysql direct connection via env vars — query templates in `references/scan-templates.md`); 5 sub-scans: booking velocity (current 30d vs. prior 30d, YoY, 90d rolling avg), revenue anomaly (avg booking value, top-10 revenue concentration), cancellation/postponement signals (cancellation rate, postponement rate), conversion signals (request-to-booking rate by destination/source), customer behavior (lead time, destination preference shifts, new market activity) |
 | **Outputs** | DB signals per sub-scan: flagged metrics with GROWTH (>+15%), DECLINE (>-15%), or ANOMALY tags |
 | **Feeds Into** | Step 4 (Signal Report — rows sourced as DB-1.1 through DB-1.5); Step 5 (Priority Detail Cards for CRITICAL/WARNING signals) |
 
@@ -186,5 +186,5 @@ Step 0 ──► Step 9: Freshness Report ◄───────────�
 
 | Artifact | Path Pattern | Frontmatter Type | Depends On |
 |---|---|---|---|
-| Signal Detection Report | `intelligence/signal-detection/YYYY-MM-DD.md` | `signal-detection-report` | health-checks, demand-signals, decision-records, initiatives, MySQL (pymysql direct), web search results |
-| Intelligence Index (signal-detection) | `intelligence/_index/signal-detection.md` | index | Signal Detection Report |
+| Signal Detection Report | `intelligence/signal-detection/YYYY-MM-DD.md` | `intelligence-report` (report_type: `signal-detection`) | health-checks, demand-signals, decision-records, initiatives, MySQL (pymysql direct), web search results |
+| Intelligence Index (signal-detection) | `intelligence/_index/intelligence-reports.md` | index | Signal Detection Report |

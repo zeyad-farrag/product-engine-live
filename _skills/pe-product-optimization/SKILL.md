@@ -11,12 +11,14 @@ description: >
   spec, and decision record. Can reclassify to repositioning or retirement
   based on root cause. Persists all artifacts to GitHub repo.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: initiative
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-product-optimization
 
@@ -49,20 +51,20 @@ metadata:
 
 ```bash
 # Check foundation context
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
 # Check existing health checks
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
 # Check competitor profiles
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
 # Check active/closed initiatives for product
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/closed --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/closed --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
 # Check decision records
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 ```
 
 ### Index-Accelerated Lookup
@@ -72,7 +74,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -83,7 +85,7 @@ approach below.
 
 Read file content via:
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/[path] --jq '.content' | base64 -d
+gh api repos/zeyad-farrag/Product-Engine/contents/[path] --jq '.content' | base64 -d
 ```
 
 **What to detect:**
@@ -102,7 +104,7 @@ gh api repos/zeyad-farrag/product-engine-live/contents/[path] --jq '.content' | 
 1. If fresh (< 90 days) relevant health-check exists → reference it, skip redundant diagnostic sub-sections
 2. If fresh competitor profiles exist → reuse for Phase 2B
 3. If active initiative overlaps → flag before starting, ask user to confirm this is a new run or continuation
-4. Note: "If you need deeper analysis, consider running the standalone pe-competitive-analysis skill"
+4. Note: "If you need deeper analysis, consider running the standalone pe-competitor-benchmarking skill"
 
 ---
 
@@ -199,7 +201,7 @@ Analyze:
 
 #### 2A-4. Customer Profile Analysis
 
-- Actual buyer demographics vs. intended audience (from foundation/personas)
+- Actual buyer demographics vs. intended audience (from artifacts/personas/)
 - Top source markets (top 3–5)
 - Customer segments (FIT, group, luxury, budget, etc.)
 - Repeat vs. first-time ratio
@@ -410,36 +412,40 @@ YAML frontmatter + summary of decision, rationale, and revisit triggers
 
 ### Artifact Storage
 
-Store all artifacts to GitHub repo using `gh` CLI:
+Store all artifacts to GitHub repo via the GitHub Contents API (no local clone needed):
 
 ```bash
 # Diagnostic Report
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks/[product]-[YYYY-MM-DD].md \
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks/[product]-[YYYY-MM-DD].md \
+  --jq '.sha' 2>/dev/null || echo "")
+
+echo '[diagnostic report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks/[product]-[YYYY-MM-DD].md \
   --method PUT \
   --field message="Product Engine: Health Check — [product]" \
-  --field content="$(base64 -w0 [local-file])"
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 
 # Competitor Profiles (one per competitor if new)
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors/[name]-[context].md \
+echo '[competitor content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors/[name]-[context].md \
   --method PUT \
   --field message="Product Engine: Competitor Profile — [name]" \
-  --field content="$(base64 -w0 [local-file])"
+  --field content=@-
 
 # Decision Record
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records/optimization-[product]-[YYYY-MM-DD].md \
+echo '[decision record content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records/optimization-[product]-[YYYY-MM-DD].md \
   --method PUT \
   --field message="Product Engine: Decision Record — optimization-[product]" \
-  --field content="$(base64 -w0 [local-file])"
+  --field content=@-
 
 # Initiative file — move from active to closed
-# 1. Create/update initiatives/closed/optimization-[product].md
-# 2. Delete initiatives/active/optimization-[product].md
+# 1. Create/update initiatives/closed/optimization-[product].md via gh api PUT
+# 2. Delete initiatives/active/optimization-[product].md via gh api DELETE
 ```
 
 **Artifact Frontmatter** (required on all artifacts):
 ```yaml
 ---
-type: health-check | competitor-profile | decision-record | optimization-plan
+type: destination-health-check | competitor-profile | decision-record | optimization-plan
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 confidence: HIGH | MEDIUM | LOW
@@ -497,11 +503,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

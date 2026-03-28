@@ -207,14 +207,14 @@ Engine skill.
 
 | Action Type | Skill to Use |
 |---|---|
-| Product health investigation | `pe-health-check` |
+| Product health investigation | `pe-product-health-check` |
 | Market entry assessment | `pe-market-entry` |
 | Product/audience fit | `pe-gap-analysis` |
-| Demand signal analysis | `pe-demand-signals` |
-| Competitor deep-dive | `pe-competitive-intelligence` |
+| Demand signal analysis | `pe-demand-signal-mining` |
+| Competitor deep-dive | `pe-competitor-benchmarking` |
 | Cross-portfolio pattern mining | `pe-cross-market-intelligence` |
 | Portfolio overview refresh | `pe-portfolio-health` |
-| Persona development | `pe-persona-builder` |
+| Persona development | `pe-persona-definition` |
 
 ---
 
@@ -224,11 +224,11 @@ What the system doesn't know that it should — ranked by strategic importance.
 
 | Gap | Why It Matters | How to Fill | Priority |
 |---|---|---|---|
-| Products never assessed | Decisions made without health data | Run `pe-health-check` on each product | [H/M/L] |
-| Markets never studied | Opportunities may exist undetected | Run `pe-market-entry` or `pe-demand-signals` | [H/M/L] |
+| Products never assessed | Decisions made without health data | Run `pe-product-health-check` on each product | [H/M/L] |
+| Markets never studied | Opportunities may exist undetected | Run `pe-market-entry` or `pe-demand-signal-mining` | [H/M/L] |
 | Stale intelligence (>90 days) | May no longer reflect current reality | Re-run the producing capability | [H/M/L] |
-| Missing competitor profiles | Blind spots in competitive landscape | Run `pe-competitive-intelligence` | [H/M/L] |
-| No persona cards for key segments | Audience understanding incomplete | Run `pe-persona-builder` | [H/M/L] |
+| Missing competitor profiles | Blind spots in competitive landscape | Run `pe-competitor-benchmarking` | [H/M/L] |
+| No persona cards for key segments | Audience understanding incomplete | Run `pe-persona-definition` | [H/M/L] |
 | Unresolved gap analyses | Known fit issues left unaddressed | Run `pe-gap-analysis` follow-up | [H/M/L] |
 
 **Staleness rule**: Any artifact whose `updated` (or `created`) date is more

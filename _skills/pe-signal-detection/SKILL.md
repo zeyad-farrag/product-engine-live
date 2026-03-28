@@ -11,12 +11,14 @@ description: >
   Designed for weekly/biweekly cadence. Output persisted to
   intelligence/signal-detection/[date].md.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: intelligence
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-signal-detection
 
@@ -32,22 +34,22 @@ Before scanning, read the current state of the repository in parallel:
 
 ```bash
 # Run all in parallel — understand what intelligence already exists
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/demand-signals \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/signal-detection \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/portfolio-health \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/portfolio-health \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 ```
 
@@ -58,7 +60,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -69,13 +71,13 @@ approach below.
 
 Read file contents with:
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/[path] \
+gh api repos/zeyad-farrag/Product-Engine/contents/[path] \
   --jq '.content' | base64 -d
 ```
 
 Also load:
 - `foundation/business-model-summary.md` (if exists)
-- `foundation/strategic-priorities.md` (if exists)
+- `foundation/domains/11-strategic-priorities.md` (if exists)
 
 **Present an Intelligence Manifest** before scanning:
 
@@ -111,7 +113,7 @@ Do NOT hard-block. Continue to scanning.
 
 ## Step 1 — Source 1: Internal Database Scan (MySQL)
 
-Database: `system_travelapp` on `66.175.216.130`. Connection via pymysql (direct, SSL disabled). See `references/scan-templates.md` for full query templates using the real schema.
+Database: `system_travelapp` (host configured via `MYSQL_HOST` env var). Connection via pymysql. See `references/scan-templates.md` for full query templates using the real schema.
 
 Run five sub-scans. For each, execute the query and report what was found.
 
@@ -257,7 +259,7 @@ Skill references to use in "Initiative/Capability to run":
 - `pe-gap-analysis` — portfolio gaps and whitespace
 - `pe-portfolio-health` — full portfolio assessment
 - `pe-foundation-session` — establish or refresh business context
-- `pe-decision-record` — log a formal decision
+- Decision records are created manually (no generating skill)
 
 ---
 
@@ -348,7 +350,8 @@ Stale threshold: >90 days since `created` date.
 ### Frontmatter
 ```yaml
 ---
-type: signal-detection-report
+type: intelligence-report
+report_type: signal-detection
 signals_found: [total count]
 critical: [count]
 warning: [count]
@@ -362,21 +365,36 @@ tags: [signal-detection, intelligence, weekly-scan]
 ```
 
 ### Mark Prior Report Superseded
-If a prior signal report exists, update its frontmatter:
+If a prior signal report exists, update its frontmatter via GitHub Contents API:
 ```bash
-# Read prior file, update status: superseded, write back and commit
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/signal-detection/[prior-date].md \
-  --jq '.content' | base64 -d > /tmp/prior-signal.md
-# Edit status: active → status: superseded
-# Re-upload with gh api PUT
+# Read prior file content and SHA
+PRIOR_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection/[prior-date].md \
+  --jq '.sha' 2>/dev/null || echo "")
+PRIOR_CONTENT=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection/[prior-date].md \
+  --jq '.content' 2>/dev/null | base64 -d)
+
+# Update status: active → status: superseded in the content, then write back
+echo "$PRIOR_CONTENT" | sed 's/^status: active/status: superseded/' | base64 -w0 | \
+  gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection/[prior-date].md \
+  --method PUT \
+  --field message="Product Engine: supersede prior signal-detection report" \
+  --field content=@- \
+  --field sha="$PRIOR_SHA"
 ```
 
 ### Commit Pattern
 ```bash
-cd product-engine-live
-git add intelligence/signal-detection/[YYYY-MM-DD].md
-git commit -m "Product Engine: signal-detection — [date] ([critical] critical, [warning] warning)"
-git push
+# Write artifact via GitHub Contents API (no local clone needed)
+# 1. Check if file already exists (to get SHA for update)
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection/[YYYY-MM-DD].md \
+  --jq '.sha' 2>/dev/null || echo "")
+
+# 2. Write/update the file
+echo '[report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection/[YYYY-MM-DD].md \
+  --method PUT \
+  --field message="Product Engine: signal-detection — [date] ([critical] critical, [warning] warning)" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -389,11 +407,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

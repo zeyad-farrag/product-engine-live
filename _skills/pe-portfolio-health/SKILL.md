@@ -14,12 +14,14 @@ description: >
   demand signal analyses, and initiatives have already been completed. Output
   persisted to intelligence/portfolio-health/[date].md.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: intelligence
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # Portfolio Health
 
@@ -47,35 +49,35 @@ listing commands in parallel:
 
 ```bash
 # Artifact directories
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/demand-signals \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/market-assessments \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/market-assessments \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
 # Intelligence and initiative layers
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/portfolio-health \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/portfolio-health \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/closed \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/closed \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 ```
 
@@ -86,7 +88,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -98,23 +100,23 @@ approach below.
 For each file returned, read its content and extract frontmatter:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/[path] \
+gh api repos/zeyad-farrag/Product-Engine/contents/[path] \
   --jq '.content' | base64 -d
 ```
 
 Also load foundation context:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/business-model-summary.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/business-model-summary.md \
   --jq '.content' | base64 -d
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/11-strategic-priorities.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/11-strategic-priorities.md \
   --jq '.content' | base64 -d
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/03-destination-portfolio.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/03-destination-portfolio.md \
   --jq '.content' | base64 -d
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/06-product-structure.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/06-product-structure.md \
   --jq '.content' | base64 -d
 ```
 
@@ -245,10 +247,17 @@ by updating its frontmatter.
 ### Commit Pattern
 
 ```bash
-cd product-engine-live
-git add intelligence/portfolio-health/[date].md
-git commit -m "Product Engine: portfolio-health — [date] ([overall_health] — [top_risk_one_word])"
-git push
+# Write artifact via GitHub Contents API (no local clone needed)
+# 1. Check if file already exists (to get SHA for update)
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/portfolio-health/[date].md \
+  --jq '.sha' 2>/dev/null || echo "")
+
+# 2. Write/update the file
+echo '[report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/portfolio-health/[date].md \
+  --method PUT \
+  --field message="Product Engine: portfolio-health — [date] ([overall_health] — [top_risk_one_word])" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -261,11 +270,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

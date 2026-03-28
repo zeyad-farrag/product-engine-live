@@ -11,12 +11,14 @@ description: >
   more valuable as more artifacts accumulate. Produces a cross-market
   intelligence report persisted to intelligence/cross-market-intelligence/.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: capability
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # Cross-Market Intelligence
 
@@ -49,27 +51,27 @@ Run all six listing commands in parallel:
 
 ```bash
 # Personas
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
 # Competitors
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
 # Demand signals
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/demand-signals \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
 # Gap analyses
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
 # Health checks
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 
 # Decision records
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 ```
 
@@ -80,7 +82,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -98,7 +100,7 @@ keys for building the intelligence map.
 
 ```bash
 # Pattern for reading any artifact
-gh api repos/zeyad-farrag/product-engine-live/contents/[path] \
+gh api repos/zeyad-farrag/Product-Engine/contents/[path] \
   --jq '.content' | base64 -d
 ```
 
@@ -127,17 +129,17 @@ cross-reference graph.
 ### Step 4: Load Foundation Context
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/business-model-summary.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/business-model-summary.md \
   --jq '.content' | base64 -d
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/11-strategic-priorities.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/11-strategic-priorities.md \
   --jq '.content' | base64 -d
 ```
 
 ### Step 5: Check for Existing Cross-Market Reports
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/cross-initiative-patterns \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-market-intelligence \
   --jq '[.[] | {name: .name, path: .path}]' 2>/dev/null || echo "[]"
 ```
 
@@ -247,10 +249,17 @@ tags: [list of searchable tags]
 ### Commit Pattern
 
 ```bash
-cd product-engine-live
-git add intelligence/cross-market-intelligence/[filename].md
-git commit -m "Product Engine: cross-market-intelligence — [SCOPE] ([date])"
-git push
+# Write artifact via GitHub Contents API (no local clone needed)
+# 1. Check if file already exists (to get SHA for update)
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-market-intelligence/[filename].md \
+  --jq '.sha' 2>/dev/null || echo "")
+
+# 2. Write/update the file
+echo '[report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-market-intelligence/[filename].md \
+  --method PUT \
+  --field message="Product Engine: cross-market-intelligence — [SCOPE] ([date])" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -263,11 +272,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

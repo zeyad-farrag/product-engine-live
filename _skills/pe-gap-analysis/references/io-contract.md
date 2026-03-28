@@ -4,10 +4,10 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | User-specified [PRODUCT] and [BENCHMARK] (audience, competitor, or market norm); GitHub repo `zeyad-farrag/product-engine-live` accessible; persona card (if benchmark is an audience) OR competitor profile (if benchmark is a competitor) |
+| **Required Inputs** | User-specified [PRODUCT] and [BENCHMARK] (audience, competitor, or market norm); GitHub repo `zeyad-farrag/Product-Engine` accessible; persona card (if benchmark is an audience) OR competitor profile (if benchmark is a competitor) |
 | **Optional Inputs** | `foundation/business-model-summary.md`; `foundation/domains/06-product-structure.md`; health check for [PRODUCT] in `artifacts/health-checks/`; existing gap analyses in `artifacts/gap-analyses/`; demand signal reports and market assessments related to [PRODUCT] or [BENCHMARK] |
 | **Produces** | Gap analysis report at `artifacts/gap-analyses/[product-kebab]-vs-[benchmark-kebab]-[date].md`; marks previous analysis as superseded if same product/benchmark pair exists |
-| **Updates** | `intelligence/_index/[gap-analyses-index].md` |
+| **Updates** | `intelligence/_index/gap-analyses.md` |
 
 ---
 
@@ -28,7 +28,7 @@
 | Field | Details |
 |---|---|
 | **Inputs** | `artifacts/personas/` directory listing (GitHub API); `artifacts/competitors/` directory listing (GitHub API); `artifacts/health-checks/` directory listing (GitHub API) |
-| **Outputs** | Confirmation that persona card exists (if benchmark is an audience); confirmation that competitor profile exists (if benchmark is a competitor); health check availability for [PRODUCT]; explicit prerequisite gap warning if any required artifact is missing (blocks analysis and recommends upstream skill) |
+| **Outputs** | Confirmation that persona card exists (if benchmark is an audience); confirmation that competitor profile exists (if benchmark is a competitor); health check availability for [PRODUCT]. **Hard block**: if the benchmark has no supporting persona card (audience benchmark) or competitor profile (competitor benchmark) _and_ the user has no data to substitute, do not proceed — emit a prerequisite gap warning naming the missing artifact, its impact (e.g., "Benchmark standard is ungrounded" for a missing persona card; "Competitive floor is unknown" for a missing competitor profile; "Current product state is unassessed" for a missing health check), and recommend the upstream skill (`pe-persona-definition`, `pe-competitor-benchmarking`, or `pe-product-health-check` respectively). |
 | **Feeds Into** | Phase 2, Step 1 (persona card / competitor profile loaded as benchmark source); Phase 2, Step 2 (health check loaded as current product state source) |
 
 ---
@@ -47,7 +47,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | `gh search code "[PRODUCT]" --repo zeyad-farrag/product-engine-live`; `gh search code "[BENCHMARK]" --repo zeyad-farrag/product-engine-live` |
+| **Inputs** | `gh search code "[PRODUCT]" --repo zeyad-farrag/Product-Engine`; `gh search code "[BENCHMARK]" --repo zeyad-farrag/Product-Engine` |
 | **Outputs** | Related demand signal reports (evidence for benchmark expectations); related market assessments (competitive standards context); prior gap analyses for same product/benchmark |
 | **Feeds Into** | Phase 2 (demand signals and market assessments provide evidence for both benchmark standard and current state) |
 
@@ -77,7 +77,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | `gh search code "CRITICAL" --repo zeyad-farrag/product-engine-live` (in `artifacts/gap-analyses/`); `gh search code "MAJOR" --repo zeyad-farrag/product-engine-live` (in `artifacts/gap-analyses/`); prior gap analyses from Step 1 |
+| **Inputs** | `gh search code "CRITICAL" --repo zeyad-farrag/Product-Engine` (in `artifacts/gap-analyses/`); `gh search code "MAJOR" --repo zeyad-farrag/Product-Engine` (in `artifacts/gap-analyses/`); prior gap analyses from Step 1 |
 | **Outputs** | Systemic gap identification (gaps appearing across multiple products for same benchmark); validation or contradiction of prior initiative conclusions; cross-analysis pattern notes appended to report |
 | **Feeds Into** | Phase 4 (finalized report includes cross-reference section) |
 
@@ -87,8 +87,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | Full gap analysis from Phase 2; cross-reference notes from Phase 3; `intelligence/_index/[gap-analyses-index].md` (current index); prior analysis file path (if superseding) |
-| **Outputs** | `artifacts/gap-analyses/[product-kebab]-vs-[benchmark-kebab]-[date].md` with YAML frontmatter (type, product, target_audience, fit_rating, confidence, status, supersedes, depends_on, initiative, tags); prior analysis updated to `status: superseded` (if applicable); updated `intelligence/_index/[gap-analyses-index].md`; Perplexity memory pointer (path + fit rating + gap counts + top gap) |
+| **Inputs** | Full gap analysis from Phase 2; cross-reference notes from Phase 3; `intelligence/_index/gap-analyses.md` (current index); prior analysis file path (if superseding) |
+| **Outputs** | `artifacts/gap-analyses/[product-kebab]-vs-[benchmark-kebab]-[date].md` with YAML frontmatter (type, product, target_audience, fit_rating, confidence, status, supersedes, depends_on, initiative, tags); prior analysis updated to `status: superseded` (if applicable); updated `intelligence/_index/gap-analyses.md`; Perplexity memory pointer (path + fit rating + gap counts + top gap) |
 | **Feeds Into** | Future cross-market intelligence runs (systemic gap patterns); future initiative planning (fit rating drives optimization/repositioning/new-product decisions) |
 
 ---
@@ -137,4 +137,4 @@ Phase 4: Store the Report
 | Artifact | Path Pattern | Frontmatter Type | Depends On |
 |---|---|---|---|
 | Gap analysis report | `artifacts/gap-analyses/[product-kebab]-vs-[benchmark-kebab]-[date].md` | `gap-analysis` | Persona card (audience benchmark), competitor profile (competitor benchmark), health check, demand signal reports, `06-product-structure.md` |
-| Gap analyses index | `intelligence/_index/[gap-analyses-index].md` | _(index table)_ | All gap analysis reports |
+| Gap analyses index | `intelligence/_index/gap-analyses.md` | _(index table)_ | All gap analysis reports |

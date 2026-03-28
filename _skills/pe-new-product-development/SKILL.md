@@ -12,12 +12,14 @@ description: >
   pricing analysis, and decision record. Four-outcome framework: BUILD /
   PIVOT / SHELVE / REJECT. Persists all artifacts to GitHub repo.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: initiative
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-new-product-development
 
@@ -35,19 +37,19 @@ Before anything else, scan the repo to orient yourself:
 
 ```bash
 # Run these in parallel
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 ```
 
@@ -58,7 +60,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -67,7 +69,7 @@ artifacts instead of listing and reading each directory. If the index file
 does not exist or returns an error, fall back to the directory-scanning
 approach below.
 
-Read file content: `gh api repos/zeyad-farrag/product-engine-live/contents/[path] --jq '.content' | base64 -d`
+Read file content: `gh api repos/zeyad-farrag/Product-Engine/contents/[path] --jq '.content' | base64 -d`
 
 **Use what you find**: If personas, competitor profiles, or demand intelligence under 90 days old are relevant to this product concept, load and reference them — don't redo the work.
 
@@ -421,28 +423,51 @@ Five sections:
 
 ### Deliverable 5: Decision Record
 
-Use the standard decision record schema from `initiative-skill-spec.md` § 10.
+Use the standard decision record schema from `references/product-design-framework.md` § Decision Record Template.
 
 ---
 
 ## Artifact Storage
 
+All artifacts are written via the GitHub Contents API (no local clone needed):
+
 ```bash
 # Persona artifacts (one per persona)
-artifacts/personas/[persona-name].md
+echo '[persona content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas/[persona-name].md \
+  --method PUT \
+  --field message="Product Engine: Persona — [persona-name]" \
+  --field content=@-
 
 # Competitor artifacts
-artifacts/competitors/[competitor-name]-[category].md
+echo '[competitor content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors/[competitor-name]-[category].md \
+  --method PUT \
+  --field message="Product Engine: Competitor — [competitor-name]" \
+  --field content=@-
 
 # Decision record
-artifacts/decision-records/new-product-[name]-[YYYY-MM-DD].md
+echo '[decision content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records/new-product-[name]-[YYYY-MM-DD].md \
+  --method PUT \
+  --field message="Product Engine: Decision Record — New Product [name]" \
+  --field content=@-
 
 # Initiative state file
-initiatives/active/new-product-[name].md
-# → moves to initiatives/closed/new-product-[name].md when done
+echo '[initiative content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active/new-product-[name].md \
+  --method PUT \
+  --field message="Product Engine: New Product — [name]" \
+  --field content=@-
+# → to close, write to initiatives/closed/ and delete from initiatives/active/
+```
 
-# Commit pattern
-git add [files] && git commit -m "Product Engine: New Product — [name]" && git push
+For updates to existing files, first retrieve the SHA:
+```bash
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/[path] \
+  --jq '.sha' 2>/dev/null || echo "")
+
+echo '[content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/[path] \
+  --method PUT \
+  --field message="[commit message]" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -455,11 +480,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

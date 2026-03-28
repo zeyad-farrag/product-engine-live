@@ -4,10 +4,10 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | User-specified query focus (destination, market, product, or pattern); GitHub repo `zeyad-farrag/product-engine-live` accessible |
+| **Required Inputs** | User-specified query focus (destination, market, product, or pattern); GitHub repo `zeyad-farrag/Product-Engine` accessible |
 | **Optional Inputs** | `foundation/domains/09-data-landscape.md` (schema reference); `foundation/business-model-summary.md`; existing demand signal reports in `artifacts/demand-signals/`; related persona cards and market assessments (found via `gh search code`) |
 | **Produces** | Demand signal report at `artifacts/demand-signals/[focus-kebab]-[date].md` |
-| **Updates** | `intelligence/_index/[demand-signals-index].md` |
+| **Updates** | `intelligence/_index/demand-signals.md` |
 
 ---
 
@@ -37,7 +37,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | `gh search code "[QUERY_FOCUS]" --repo zeyad-farrag/product-engine-live` — searches across personas, market assessments, and initiative records |
+| **Inputs** | `gh search code "[QUERY_FOCUS]" --repo zeyad-farrag/Product-Engine` — searches across personas, market assessments, and initiative records |
 | **Outputs** | List of related artifacts (persona cards, market assessments, initiative records) relevant to [QUERY_FOCUS] |
 | **Feeds Into** | Phase 3 (cross-reference synthesis checks findings against these artifacts) |
 
@@ -57,7 +57,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | MySQL (pymysql direct connection): `operation_files`, `requests`, `clients`, `countries`, `acc_srv_orders`, `acc_srv_orders_operation_files`, `destinations`, `sources` tables filtered to [QUERY_FOCUS]; `references/analysis-templates.md` (table formats for all 6 analyses); foundation schema from Step 2 |
+| **Inputs** | MySQL (pymysql direct connection via env vars): `operation_files`, `requests`, `clients`, `countries`, `acc_srv_orders`, `acc_srv_orders_operation_files`, `destinations`, `sources` tables filtered to [QUERY_FOCUS]; `references/analysis-templates.md` (table formats for all 6 analyses); foundation schema from Step 2 |
 | **Outputs** | Up to 6 analysis outputs: (1) Volume & Revenue Trends, (2) Segmentation Breakdown, (3) Seasonality Pattern, (4) Amendment Signal Intelligence, (5) Customer Behavior Patterns, (6) Conversion Indicators — each as a structured table; explicit gap notes for any skipped analysis |
 | **Feeds Into** | Phase 3 (all 6 analysis outputs are synthesized) |
 
@@ -77,8 +77,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | Synthesis from Phase 3; all analysis tables from Phase 2; `intelligence/_index/[demand-signals-index].md` (current index content) |
-| **Outputs** | `artifacts/demand-signals/[focus-kebab]-[date].md` with YAML frontmatter (type, focus, period, data_source, confidence, status, supersedes, depends_on, initiative, tags); updated `intelligence/_index/[demand-signals-index].md`; Perplexity memory pointer (path + one-line summary + top signal) |
+| **Inputs** | Synthesis from Phase 3; all analysis tables from Phase 2; `intelligence/_index/demand-signals.md` (current index content) |
+| **Outputs** | `artifacts/demand-signals/[focus-kebab]-[date].md` with YAML frontmatter (type, focus, period, data_source, confidence, status, supersedes, depends_on, initiative, tags); updated `intelligence/_index/demand-signals.md`; Perplexity memory pointer (path + one-line summary + top signal) |
 | **Feeds Into** | Future demand signal analyses (this report becomes baseline for trend comparison) |
 
 ---
@@ -119,5 +119,5 @@ Phase 4: Store the Report
 
 | Artifact | Path Pattern | Frontmatter Type | Depends On |
 |---|---|---|---|
-| Demand signal report | `artifacts/demand-signals/[focus-kebab]-[date].md` | `demand-signal-report` | MySQL booking/amendment data, `09-data-landscape.md`, related personas and market assessments |
-| Demand signals index | `intelligence/_index/[demand-signals-index].md` | _(index table)_ | All demand signal reports |
+| Demand signal report | `artifacts/demand-signals/[focus-kebab]-[date].md` | `demand-signal` | MySQL booking/amendment data, `09-data-landscape.md`, related personas and market assessments |
+| Demand signals index | `intelligence/_index/demand-signals.md` | _(index table)_ | All demand signal reports |

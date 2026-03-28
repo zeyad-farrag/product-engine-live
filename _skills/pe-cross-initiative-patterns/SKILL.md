@@ -12,12 +12,14 @@ description: >
   next initiatives. Most valuable after 3+ completed initiatives. Output
   persisted to intelligence/cross-initiative-patterns/[date].md.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: intelligence
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # Cross-Initiative Pattern Mining
 
@@ -49,17 +51,12 @@ Before anything else, set today's date:
 TODAY=$(date +%Y-%m-%d)
 ```
 
-Clone repo locally (required for git operations at the end):
-```bash
-cd /tmp && git clone https://github.com/zeyad-farrag/product-engine-live.git 2>/dev/null || (cd /tmp/product-engine-live && git pull)
-```
-
 ---
 
 ## Step 0 — Foundation Check
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/business-model-summary.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/business-model-summary.md \
   --jq '.content' | base64 -d 2>/dev/null || echo "NOT_FOUND"
 ```
 
@@ -70,7 +67,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -90,52 +87,52 @@ Run all listing commands simultaneously. Do not wait for one before starting ano
 
 ```bash
 # Artifact directories
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/demand-signals \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/market-assessments \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/market-assessments \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
 # Intelligence layer
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/portfolio-health \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/portfolio-health \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/signal-detection \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/signal-detection \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/cross-initiative-patterns \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-initiative-patterns \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
 # Initiatives
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/closed \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/closed \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 
 # Foundation
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation \
   --jq '[.[] | {name, path}]' 2>/dev/null || echo "[]"
 ```
 
 **Read each file** via:
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/[path] --jq '.content' | base64 -d
+gh api repos/zeyad-farrag/Product-Engine/contents/[path] --jq '.content' | base64 -d
 ```
 
 Read all files in parallel where possible. Prioritize: initiatives → personas → competitors → decision-records → gap-analyses → demand-signals → health-checks → intelligence layer.
@@ -360,38 +357,38 @@ tags: [cross-initiative, patterns, institutional-learning, [markets covered], [k
 
 ### Mark Prior Reports Superseded
 
-For each file in `intelligence/cross-initiative-patterns/` (except today's):
+For each file in `intelligence/cross-initiative-patterns/` (except today's), update via GitHub Contents API:
 ```bash
-# Read, update status: active → superseded, write back
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/cross-initiative-patterns/[prior-file].md \
-  --jq '.content' | base64 -d | sed 's/^status: active/status: superseded/' > /tmp/prior_updated.md
+# Get SHA and content for the prior file
+PRIOR_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-initiative-patterns/[prior-file].md \
+  --jq '.sha' 2>/dev/null || echo "")
+PRIOR_CONTENT=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-initiative-patterns/[prior-file].md \
+  --jq '.content' 2>/dev/null | base64 -d)
 
-# Get SHA for update
-SHA=$(gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/cross-initiative-patterns/[prior-file].md --jq '.sha')
-
-# Push update
-CONTENT=$(base64 -w 0 /tmp/prior_updated.md)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/cross-initiative-patterns/[prior-file].md \
-  -X PUT \
-  -f message="Product Engine: supersede prior cross-initiative-patterns report" \
-  -f content="$CONTENT" \
-  -f sha="$SHA"
+# Update status: active → status: superseded in the content, then write back
+echo "$PRIOR_CONTENT" | sed 's/^status: active/status: superseded/' | base64 -w0 | \
+  gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-initiative-patterns/[prior-file].md \
+  --method PUT \
+  --field message="Product Engine: supersede prior cross-initiative-patterns report" \
+  --field content=@- \
+  --field sha="$PRIOR_SHA"
 ```
 
 ### Commit New Report
 
+Write the new report via GitHub Contents API (no local clone needed):
+
 ```bash
-cd /tmp/product-engine-live
-git pull
+# Check if file already exists (to get SHA for update)
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-initiative-patterns/${TODAY}.md \
+  --jq '.sha' 2>/dev/null || echo "")
 
-# Write new report file
-cat > intelligence/cross-initiative-patterns/${TODAY}.md << 'EOF'
-[full report content]
-EOF
-
-git add intelligence/cross-initiative-patterns/${TODAY}.md
-git commit -m "Product Engine: cross-initiative-patterns — ${TODAY} ([initiatives_analyzed] initiatives, [artifacts_analyzed] artifacts)"
-git push
+# Write the report
+echo '[full report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/cross-initiative-patterns/${TODAY}.md \
+  --method PUT \
+  --field message="Product Engine: cross-initiative-patterns — ${TODAY} ([initiatives_analyzed] initiatives, [artifacts_analyzed] artifacts)" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -404,11 +401,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

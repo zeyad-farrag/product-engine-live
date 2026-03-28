@@ -291,7 +291,7 @@ Artifact stored at `artifacts/health-checks/[product]-[YYYY-MM-DD].md`
 
 ```markdown
 ---
-type: health-check
+type: destination-health-check
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 confidence: HIGH | MEDIUM | LOW

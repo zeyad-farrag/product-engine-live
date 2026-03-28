@@ -4,10 +4,10 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | User-specified product, product line, or category; GitHub repo `zeyad-farrag/product-engine-live` accessible |
+| **Required Inputs** | User-specified product, product line, or category; GitHub repo `zeyad-farrag/Product-Engine` accessible |
 | **Optional Inputs** | `foundation/business-model-summary.md`; `foundation/domains/06-product-structure.md`; `foundation/domains/10-pricing-policies.md`; `foundation/domains/07-competitive-landscape.md`; existing health checks in `artifacts/health-checks/`; related demand signal reports and competitor profiles (found via `gh search code`) |
 | **Produces** | Health check report at `artifacts/health-checks/[product-kebab]-[date].md`; marks previous check as superseded if one exists |
-| **Updates** | `intelligence/_index/[health-checks-index].md` |
+| **Updates** | `intelligence/_index/health-checks.md` |
 
 ---
 
@@ -37,7 +37,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | `gh search code "[PRODUCT]" --repo zeyad-farrag/product-engine-live` — searches demand signal reports and competitor profiles |
+| **Inputs** | `gh search code "[PRODUCT]" --repo zeyad-farrag/Product-Engine` — searches demand signal reports and competitor profiles |
 | **Outputs** | List of relevant demand signal reports (provides booking/amendment data); relevant competitor profiles (provides competitive position data) |
 | **Feeds Into** | Phase 2 (demand signals feed Performance Vitals and Amendment Intelligence; competitor profiles feed Competitive Position Check) |
 
@@ -57,7 +57,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | MySQL (pymysql direct connection): `operation_files`, `requests`, `clients`, `countries`, `acc_srv_orders`, `acc_srv_orders_operation_files`, `destinations`, `sources` tables filtered to [PRODUCT]; `references/health-assessment-template.md` (all 8 section templates); foundation context from Step 2; demand signal reports from Step 3; competitor profiles from Step 3; prior health check scores from Step 1 |
+| **Inputs** | MySQL (pymysql direct connection via env vars): `operation_files`, `requests`, `clients`, `countries`, `acc_srv_orders`, `acc_srv_orders_operation_files`, `destinations`, `sources` tables filtered to [PRODUCT]; `references/health-assessment-template.md` (all 8 section templates); foundation context from Step 2; demand signal reports from Step 3; competitor profiles from Step 3; prior health check scores from Step 1 |
 | **Outputs** | 8 scored assessment sections: (1) Performance Vitals — Revenue/Conversion/Customer/Seasonal health, (2) Amendment Intelligence Snapshot, (3) Competitive Position Check, (4) Lifecycle Position, (5) Composite Health Score (weighted 0–100), (6) Attention Flags, (7) Comparison to Previous (deltas if prior check exists), (8) Recommendations; explicit gap notes for any skipped section |
 | **Feeds Into** | Phase 3 (raw scores fed into composite calculation) |
 
@@ -77,8 +77,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | All section outputs from Phase 2; composite score from Phase 3; `intelligence/_index/[health-checks-index].md` (current index); prior health check file path (if superseding) |
-| **Outputs** | `artifacts/health-checks/[product-kebab]-[date].md` with YAML frontmatter (type, product, health_rating, composite_score, confidence, status, supersedes, depends_on, initiative, tags); prior health check updated to `status: superseded` (if applicable); updated `intelligence/_index/[health-checks-index].md`; Perplexity memory pointer (path + score + classification + top flag) |
+| **Inputs** | All section outputs from Phase 2; composite score from Phase 3; `intelligence/_index/health-checks.md` (current index); prior health check file path (if superseding) |
+| **Outputs** | `artifacts/health-checks/[product-kebab]-[date].md` with YAML frontmatter (type, product, health_rating, composite_score, confidence, status, supersedes, depends_on, initiative, tags); prior health check updated to `status: superseded` (if applicable); updated `intelligence/_index/health-checks.md`; Perplexity memory pointer (path + score + classification + top flag) |
 | **Feeds Into** | Future health checks for same product (this report becomes the prior check baseline) |
 
 ---
@@ -121,5 +121,5 @@ Phase 4: Store the Report
 
 | Artifact | Path Pattern | Frontmatter Type | Depends On |
 |---|---|---|---|
-| Health check report | `artifacts/health-checks/[product-kebab]-[date].md` | `health-check` | MySQL booking/amendment data, `06-product-structure.md`, `07-competitive-landscape.md`, `10-pricing-policies.md`, demand signal reports, competitor profiles |
-| Health checks index | `intelligence/_index/[health-checks-index].md` | _(index table)_ | All health check reports |
+| Health check report | `artifacts/health-checks/[product-kebab]-[date].md` | `destination-health-check` | MySQL booking/amendment data, `06-product-structure.md`, `07-competitive-landscape.md`, `10-pricing-policies.md`, demand signal reports, competitor profiles |
+| Health checks index | `intelligence/_index/health-checks.md` | _(index table)_ | All health check reports |

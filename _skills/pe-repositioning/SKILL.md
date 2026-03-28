@@ -12,12 +12,14 @@ description: >
   gap analysis matrix, implementation brief, audience personas, and decision
   record. Persists all artifacts to GitHub repo.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: initiative
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-repositioning — Product Repositioning Initiative
 
@@ -33,17 +35,17 @@ Before any phase, scan the repo for existing context. Run these in parallel:
 
 ```bash
 # Foundation context
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
 
 # Active/closed initiatives (repositioning overlap)
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/closed --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/closed --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
 
 # Existing personas, competitors, health-checks
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses --jq '[.[] | {name,path}]' 2>/dev/null || echo "[]"
 ```
 
 ### Index-Accelerated Lookup
@@ -53,7 +55,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -62,7 +64,7 @@ artifacts instead of listing and reading each directory. If the index file
 does not exist or returns an error, fall back to the directory-scanning
 approach below.
 
-Read any file: `gh api repos/zeyad-farrag/product-engine-live/contents/[path] --jq '.content' | base64 -d`
+Read any file: `gh api repos/zeyad-farrag/Product-Engine/contents/[path] --jq '.content' | base64 -d`
 
 **Foundation Check**: If `foundation/business-model-summary.md` is absent:
 - Nudge 1: "Foundation Session hasn't been run yet. This initiative benefits significantly from business context. Consider running pe-foundation-session first."
@@ -107,7 +109,7 @@ Surface any ambiguity now. Confirm with the user before entering DISCOVER.
 ### 1.4 Create Initiative State File
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/active/repositioning-[product]-[audience].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/active/repositioning-[product]-[audience].md \
   --method PUT \
   --field message="Product Engine: initiative started — repositioning [product] for [audience]" \
   --field content="$(echo '---
@@ -367,22 +369,22 @@ INFLECTION POINT 2: Is this repositioning strategy ready to execute?
 
 ```bash
 # Gap analysis
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses/[product]-vs-[audience]-[date].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses/[product]-vs-[audience]-[date].md \
   --method PUT --field message="Product Engine: gap analysis — [product] vs [audience]" \
   --field content="$(cat artifact.md | base64)"
 
 # Personas (one per persona)
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas/[name].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas/[name].md \
   --method PUT --field message="Product Engine: persona — [name]" \
   --field content="$(cat persona.md | base64)"
 
 # Competitors (one per competitor)
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors/[name]-[audience-market].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors/[name]-[audience-market].md \
   --method PUT --field message="Product Engine: competitor — [name] ([audience-market])" \
   --field content="$(cat competitor.md | base64)"
 
 # Decision record
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records/repositioning-[product]-[audience]-[date].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records/repositioning-[product]-[audience]-[date].md \
   --method PUT --field message="Product Engine: decision record — repositioning [product] for [audience]" \
   --field content="$(cat decision.md | base64)"
 ```
@@ -411,11 +413,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

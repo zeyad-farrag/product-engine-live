@@ -10,12 +10,14 @@ description: >
   only to intelligence/_index/ — never modifies artifact content. Recommended
   monthly cadence.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: memory
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-memory-maintenance
 
@@ -40,7 +42,7 @@ Recommended cadence: monthly, or after a batch of initiative completions.
 
 ## Repo & Tooling
 
-- **Repo**: `zeyad-farrag/product-engine-live`
+- **Repo**: `zeyad-farrag/Product-Engine`
 - **CLI**: `gh` with `api_credentials=["github"]`
 - **Index location**: `intelligence/_index/` (10 files)
 - **Write scope**: `intelligence/_index/` ONLY — never modify artifact content
@@ -54,7 +56,7 @@ actual file counts in the corresponding directories.
 
 ```bash
 # Count files in each artifact directory
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq 'length' 2>/dev/null || echo 0
 # Repeat for each directory (see full list in maintenance-procedures.md)
 ```
@@ -62,7 +64,7 @@ gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
 Read each index file and extract `artifact_count` from its YAML frontmatter:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/personas.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/personas.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -83,36 +85,36 @@ the full algorithm.
 # Artifact directories
 for dir in personas competitors demand-signals health-checks gap-analyses \
     market-assessments decision-records; do
-  gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/${dir} \
+  gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/${dir} \
     --jq '[.[] | select(.type=="file") | {name, path}]' \
     2>/dev/null || echo "[]"
 done
 
 # Intelligence reports
 for dir in portfolio-health signal-detection cross-initiative-patterns cross-market-intelligence; do
-  gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/${dir} \
+  gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/${dir} \
     --jq '[.[] | select(.type=="file") | {name, path}]' \
     2>/dev/null || echo "[]"
 done
 
 # Initiatives
 for dir in active closed; do
-  gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/${dir} \
+  gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/${dir} \
     --jq '[.[] | select(.type=="file") | {name, path}]' \
     2>/dev/null || echo "[]"
 done
 
 # Foundation
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains \
   --jq '[.[] | select(.type=="file") | {name, path}]' 2>/dev/null || echo "[]"
 ```
 
 **Step 2 — Read each artifact's frontmatter:**
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/<path> \
+gh api repos/zeyad-farrag/Product-Engine/contents/<path> \
   --jq '.content' | base64 -d | head -30
 ```
 
@@ -125,35 +127,26 @@ status, session, depends_on. Apply defaults for missing fields:
 **Step 3 — Build all 10 index files** using the format in
 `references/index-schema.md`. See schema for column layout per index type.
 
-**Step 4 — Commit and push:**
+**Step 4 — Write index files via GitHub Contents API (no local clone needed):**
 
-```bash
-git add intelligence/_index/
-git commit -m "Product Engine: memory maintenance — $(date +%Y-%m-%d) \
-  ([N] artifacts indexed)"
-git push
-```
-
-To write an index file via the GitHub API (no local clone needed):
+For each of the 10 index files, write via `gh api` PUT:
 
 ```bash
 # Get current SHA if file exists (needed for update)
-CURRENT_SHA=$(gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/personas.md \
+CURRENT_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[index-name].md \
   --jq '.sha' 2>/dev/null || echo "")
 
-# Create/update file
-CONTENT=$(cat index-content.md | base64 -w0)
-
-if [ -n "$CURRENT_SHA" ]; then
-  gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/personas.md \
-    -X PUT -f message="Product Engine: rebuild personas index" \
-    -f content="$CONTENT" -f sha="$CURRENT_SHA"
-else
-  gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/personas.md \
-    -X PUT -f message="Product Engine: create personas index" \
-    -f content="$CONTENT"
-fi
+# Write/update index file
+echo '[index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[index-name].md \
+  --method PUT \
+  --field message="Product Engine: memory maintenance — [date] (rebuild [index-name] index)" \
+  --field content=@- \
+  ${CURRENT_SHA:+--field sha="$CURRENT_SHA"}
 ```
+
+Repeat for each index file: `personas.md`, `competitors.md`, `demand-signals.md`,
+`health-checks.md`, `gap-analyses.md`, `market-assessments.md`, `decision-records.md`,
+`initiatives.md`, `intelligence-reports.md`, `foundation.md`.
 
 ---
 
@@ -182,9 +175,9 @@ Present findings as a table:
 
 Map artifact types to suggested actions:
 - gap-analyses → `pe-gap-analysis`
-- health-checks → `pe-health-check`
-- market-assessments → `pe-market-assessment`
-- decision-records → `pe-decision-record`
+- health-checks → `pe-product-health-check`
+- market-assessments → `pe-market-entry`
+- decision-records → manually created (no generating skill)
 - intelligence reports → `pe-cross-initiative-patterns` / `pe-signal-detection`
 
 See `references/maintenance-procedures.md` §2 for full staleness logic.
@@ -237,7 +230,7 @@ Detect redundancy patterns and suggest consolidation tasks.
 
 **Detection rules:**
 1. Same competitor name (case-insensitive) in 3+ competitor files → suggest
-   canonical profile merge (tag: `pe-competitor-analysis`)
+   canonical profile merge (tag: `pe-competitor-benchmarking`)
 2. Same persona archetype across 3+ markets → suggest archetype elevation
    (tag: `pe-cross-initiative-patterns`)
 3. Multiple demand signal reports with same `subject` + overlapping date

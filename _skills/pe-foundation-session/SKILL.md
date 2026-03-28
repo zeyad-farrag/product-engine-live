@@ -14,10 +14,10 @@ metadata:
   version: '2.0'
   layer: foundation
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # Product Engine: Foundation Session
 
@@ -29,7 +29,7 @@ Every other Product Engine skill depends on this foundation. Run it once, thorou
 
 ## Storage Architecture
 
-**Structured artifacts → GitHub repo** (`zeyad-farrag/product-engine-live`)
+**Structured artifacts → GitHub repo** (`zeyad-farrag/Product-Engine`)
 - Each domain summary is written as a markdown file in `foundation/domains/`
 - The business model summary goes to `foundation/business-model-summary.md`
 - The intelligence readiness assessment goes to `foundation/intelligence-readiness.md`
@@ -58,7 +58,7 @@ Before taking any action, determine the session state:
 
 1. **Check the GitHub repo** for existing foundation files:
    ```bash
-   gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains --jq '.[].name' 2>/dev/null
+   gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains --jq '.[].name' 2>/dev/null
    ```
 
 2. **Assess what exists:**
@@ -76,10 +76,10 @@ Before the first domain, ensure the local repo is ready:
 ```bash
 # Clone if not already present
 cd /home/user/workspace
-if [ ! -d "product-engine-live" ]; then
-  gh repo clone zeyad-farrag/product-engine-live
+if [ ! -d "Product-Engine" ]; then
+  gh repo clone zeyad-farrag/Product-Engine
 fi
-cd product-engine-live
+cd Product-Engine
 git pull origin main
 
 # Ensure directory structure exists
@@ -93,7 +93,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -195,7 +195,7 @@ file and understand this aspect of the business.]
 After writing each domain file:
 
 ```bash
-cd /home/user/workspace/product-engine-live
+cd /home/user/workspace/Product-Engine
 git add foundation/domains/[filename]
 git commit -m "Foundation: Domain N — [Domain Name]"
 git push origin main
@@ -280,7 +280,7 @@ Include this as a section within `foundation/business-model-summary.md`.
 ### Final commit
 
 ```bash
-cd /home/user/workspace/product-engine-live
+cd /home/user/workspace/Product-Engine
 git add foundation/business-model-summary.md foundation/intelligence-readiness.md foundation/confidence-map.md
 git commit -m "Foundation: Session complete — summary, readiness, confidence map"
 git push origin main
@@ -312,7 +312,7 @@ After the final commit, store a single pointer in Perplexity memory:
 
 ```
 Remember that Product Engine Foundation Session is complete for [company name].
-All foundation data is stored in the GitHub repo zeyad-farrag/product-engine-live
+All foundation data is stored in the GitHub repo zeyad-farrag/Product-Engine
 under the foundation/ directory. [X] of 12 domains completed, [Y] skipped.
 Last updated [date]. To read foundation context, clone or fetch the repo and
 read files from foundation/domains/.

@@ -4,10 +4,10 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | User-specified context (market, product, or audience); GitHub repo `zeyad-farrag/product-engine-live` accessible |
+| **Required Inputs** | User-specified context (market, product, or audience); GitHub repo `zeyad-farrag/Product-Engine` accessible |
 | **Optional Inputs** | `foundation/domains/07-competitive-landscape.md`, `foundation/domains/04-source-markets.md`, `foundation/domains/05-customer-segmentation.md`, `foundation/domains/03-destination-portfolio.md`, `foundation/domains/06-product-structure.md`, `foundation/domains/10-pricing-policies.md`, `foundation/domains/11-strategic-priorities.md`; existing competitor profiles in `artifacts/competitors/`; persona cards in `artifacts/personas/` |
 | **Produces** | Competitor profile files at `artifacts/competitors/[kebab-case-name]-[market-context].md`; benchmark summary at `artifacts/competitors/_benchmark-[context]-[YYYY-MM-DD].md` |
-| **Updates** | `intelligence/_index/[competitors-index].md` |
+| **Updates** | `intelligence/_index/competitors.md` |
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | GitHub repo `zeyad-farrag/product-engine-live`; local workspace `/home/user/workspace` |
+| **Inputs** | GitHub repo `zeyad-farrag/Product-Engine`; local workspace `/home/user/workspace` |
 | **Outputs** | Cloned or pulled repo; index file(s) at `intelligence/_index/{category}.md` (attempted fast-path read) |
 | **Feeds Into** | Step 1 (context check) |
 
@@ -79,8 +79,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | Profile drafts from Phase 2; benchmark summary from Phase 4; `intelligence/_index/[competitors-index].md` (current index); cross-reference check against existing `artifacts/competitors/` |
-| **Outputs** | `artifacts/competitors/[kebab-case-name]-[market-context].md` per competitor (YAML frontmatter: type, name, market, destinations, positioning, threat_level, confidence, status, initiative, tags); `artifacts/competitors/_benchmark-[context]-[YYYY-MM-DD].md`; updated `intelligence/_index/[competitors-index].md` |
+| **Inputs** | Profile drafts from Phase 2; benchmark summary from Phase 4; `intelligence/_index/competitors.md` (current index); cross-reference check against existing `artifacts/competitors/` |
+| **Outputs** | `artifacts/competitors/[kebab-case-name]-[market-context].md` per competitor (YAML frontmatter: type, name, market, destinations, positioning, threat_level, confidence, status, initiative, tags); `artifacts/competitors/_benchmark-[context]-[YYYY-MM-DD].md`; updated `intelligence/_index/competitors.md` |
 | **Feeds Into** | Step 6 (memory pointer references committed paths) |
 
 ---
@@ -136,4 +136,4 @@ Step 6: Memory Pointer
 |---|---|---|---|
 | Competitor profile | `artifacts/competitors/[kebab-name]-[market-context].md` | `competitor-profile` | Web research, foundation domains 04/05/06/07/10/11, persona cards |
 | Benchmark summary | `artifacts/competitors/_benchmark-[context]-[YYYY-MM-DD].md` | `benchmark-summary` | All competitor profiles for this context |
-| Competitors index | `intelligence/_index/[competitors-index].md` | _(index table)_ | All competitor profiles and benchmark summaries |
+| Competitors index | `intelligence/_index/competitors.md` | _(index table)_ | All competitor profiles and benchmark summaries |

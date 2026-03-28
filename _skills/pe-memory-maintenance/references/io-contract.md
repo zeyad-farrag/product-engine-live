@@ -4,7 +4,7 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | GitHub repo access (`zeyad-farrag/product-engine-live`); at least one artifact directory or index file to operate on |
+| **Required Inputs** | GitHub repo access (`zeyad-farrag/Product-Engine`); at least one artifact directory or index file to operate on |
 | **Optional Inputs** | Existing `intelligence/_index/` files (required for Modes 2–6; Mode 1 rebuilds them from scratch) |
 | **Produces** | Up to 10 updated index files at `intelligence/_index/`; Memory Health Dashboard (conversational output) |
 | **Updates** | `intelligence/_index/*.md` (all 10 files in Mode 1; subset in other modes) — **no other files modified** |
@@ -55,12 +55,12 @@ When triggered by "run memory maintenance", "check memory health", or "memory hy
 | **Outputs** | 10 rebuilt index markdown files (in memory, ready to commit) |
 | **Feeds Into** | Mode 1 Step 4 |
 
-**Step 4 — Commit and push**
+**Step 4 — Write index files via GitHub Contents API**
 
 | Field | Details |
 |---|---|
 | **Inputs** | 10 rebuilt index files |
-| **Outputs** | `intelligence/_index/{personas,competitors,demand-signals,health-checks,gap-analyses,market-assessments,decision-records,initiatives,intelligence-reports,foundation}.md` committed and pushed |
+| **Outputs** | `intelligence/_index/{personas,competitors,demand-signals,health-checks,gap-analyses,market-assessments,decision-records,initiatives,intelligence-reports,foundation}.md` written via `gh api` PUT |
 | **Feeds Into** | Modes 2–5 (which now read the freshly rebuilt indexes) |
 
 ---
@@ -94,7 +94,7 @@ When triggered by "run memory maintenance", "check memory health", or "memory hy
 | Field | Details |
 |---|---|
 | **Inputs** | All 10 index files; artifact content (subject, markets, conclusions) for pattern detection |
-| **Outputs** | Consolidation suggestions: duplicate competitor profiles (→ `pe-competitor-analysis`), cross-market persona archetypes (→ `pe-cross-initiative-patterns`), overlapping demand signal reports (→ `pe-signal-detection`), contradicting decision records (→ human review) |
+| **Outputs** | Consolidation suggestions: duplicate competitor profiles (→ `pe-competitor-benchmarking`), cross-market persona archetypes (→ `pe-cross-initiative-patterns`), overlapping demand signal reports (→ `pe-signal-detection`), contradicting decision records (→ human review) |
 | **Feeds Into** | Memory Health Dashboard |
 
 ---
@@ -114,7 +114,7 @@ Mode 6: Index Validation
       │                        │
       │                    Step 3: Build 10 index files
       │                        │
-      │                    Step 4: Commit & push ──► intelligence/_index/*.md (×10)
+      │                    Step 4: gh api PUT ──► intelligence/_index/*.md (×10)
       │                        │
       └─ no drift ─────────────┤
                                │

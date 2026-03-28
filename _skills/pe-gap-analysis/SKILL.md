@@ -9,12 +9,14 @@ description: >
   (STRONG_FIT/FIXABLE_FIT/REPOSITIONING_NEEDED/REDESIGN_NEEDED/FUNDAMENTAL_MISMATCH).
   Persisted to the GitHub intelligence store at artifacts/gap-analyses/.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: capability
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # Gap Analysis
 
@@ -43,7 +45,7 @@ Before running analysis, orient yourself in the intelligence store.
 ### Step 1: Check for Existing Gap Analyses
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses \
   --jq '[.[] | {name: .name, path: .path}]'
 ```
 
@@ -54,7 +56,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -66,7 +68,7 @@ approach below.
 If gap analyses exist for the same product or benchmark, retrieve the most recent one:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/gap-analyses/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses/[filename].md \
   --jq '.content' | base64 -d
 ```
 
@@ -78,15 +80,15 @@ A gap analysis is only as good as the intelligence behind it. Check for the foll
 
 ```bash
 # Check for persona cards (required if benchmark is an audience)
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas \
   --jq '[.[] | {name: .name}]'
 
 # Check for competitor profiles (required if benchmark is a competitor)
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors \
   --jq '[.[] | {name: .name}]'
 
 # Check for health checks on this product
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks \
   --jq '[.[] | {name: .name}]'
 ```
 
@@ -103,10 +105,10 @@ gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
 ### Step 3: Load Foundation Context
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/business-model-summary.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/business-model-summary.md \
   --jq '.content' | base64 -d
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/06-product-structure.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/06-product-structure.md \
   --jq '.content' | base64 -d
 ```
 
@@ -114,8 +116,8 @@ gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/06-pro
 
 ```bash
 # Search for any artifacts related to the product or benchmark
-gh search code "[PRODUCT]" --repo zeyad-farrag/product-engine-live
-gh search code "[BENCHMARK]" --repo zeyad-farrag/product-engine-live
+gh search code "[PRODUCT]" --repo zeyad-farrag/Product-Engine
+gh search code "[BENCHMARK]" --repo zeyad-farrag/Product-Engine
 ```
 
 Look specifically for:
@@ -161,9 +163,9 @@ Before finalizing, check whether similar gaps appear in other analyses:
 
 ```bash
 # Search for CRITICAL or MAJOR severity tags across gap analyses
-gh search code "CRITICAL" --repo zeyad-farrag/product-engine-live \
+gh search code "CRITICAL" --repo zeyad-farrag/Product-Engine \
   -- artifacts/gap-analyses/
-gh search code "MAJOR" --repo zeyad-farrag/product-engine-live \
+gh search code "MAJOR" --repo zeyad-farrag/Product-Engine \
   -- artifacts/gap-analyses/
 ```
 
@@ -224,10 +226,17 @@ tags: [list of searchable tags]
 ### Commit Pattern
 
 ```bash
-cd product-engine-live
-git add artifacts/gap-analyses/[filename].md
-git commit -m "Product Engine: gap-analysis — [PRODUCT] vs. [BENCHMARK] ([date])"
-git push
+# Write artifact via GitHub Contents API (no local clone needed)
+# 1. Check if file already exists (to get SHA for update)
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses/[filename].md \
+  --jq '.sha' 2>/dev/null || echo "")
+
+# 2. Write/update the file
+echo '[report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/gap-analyses/[filename].md \
+  --method PUT \
+  --field message="Product Engine: gap-analysis — [PRODUCT] vs. [BENCHMARK] ([date])" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -240,11 +249,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

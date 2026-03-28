@@ -204,14 +204,14 @@ Which type would you like me to deep-dive into full artifact content?
 
 | Missing Artifact Type | Recommended Skill |
 |---|---|
-| Personas | `pe-persona-builder` |
+| Personas | `pe-persona-definition` |
 | Competitor profiles | `pe-competitor-benchmarking` |
 | Demand signals | `pe-demand-signal-mining` |
-| Health checks | `pe-health-check` |
+| Health checks | `pe-product-health-check` |
 | Gap analyses | `pe-gap-analysis` |
-| Market assessments | `pe-market-assessment` |
+| Market assessments | `pe-market-entry` |
 | Decision records | No skill — decisions are logged manually or via initiative close-out |
 | Index files missing entirely | `pe-memory-maintenance` (rebuild index) |
 
 Always phrase gap suggestions as actionable offers:
-> "No persona data found for Australia. Would you like me to run pe-persona-builder for the Australian market?"
+> "No persona data found for Australia. Would you like me to run pe-persona-definition for the Australian market?"

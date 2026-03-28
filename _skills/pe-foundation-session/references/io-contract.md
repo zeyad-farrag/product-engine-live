@@ -4,7 +4,7 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | User (conversational) — answers to 12 domain interviews; GitHub repo access (`zeyad-farrag/product-engine-live`) |
+| **Required Inputs** | User (conversational) — answers to 12 domain interviews; GitHub repo access (`zeyad-farrag/Product-Engine`) |
 | **Optional Inputs** | Existing `foundation/domains/` files (enables Refresh or Gap-Fill mode instead of Full Session); documents/URLs provided by user during interview |
 | **Produces** | 12 domain files (`foundation/domains/`), `foundation/business-model-summary.md`, `foundation/intelligence-readiness.md`, `foundation/confidence-map.md`; Perplexity memory pointer |
 | **Updates** | `intelligence/_index/foundation.md` (if it already exists); no other index files touched |
@@ -27,8 +27,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | GitHub repo (`zeyad-farrag/product-engine-live`) |
-| **Outputs** | Local clone at `/home/user/workspace/product-engine-live`; `foundation/domains/` directory created |
+| **Inputs** | GitHub repo (`zeyad-farrag/Product-Engine`) |
+| **Outputs** | Local clone at `/home/user/workspace/Product-Engine`; `foundation/domains/` directory created |
 | **Feeds Into** | Step 3 |
 
 ### Step 3: Domain Interview (×12, sequential)

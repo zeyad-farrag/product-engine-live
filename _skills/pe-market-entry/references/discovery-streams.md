@@ -6,7 +6,7 @@ Reference for all five parallel research streams in the DISCOVER phase.
 
 ## Stream 2A — Internal Demand Signal Mining (MySQL)
 
-Database: `system_travelapp` on `66.175.216.130`. Connection via pymysql (direct, SSL disabled). All queries use the real schema.
+Database: `system_travelapp` (host configured via `MYSQL_HOST` env var). Connection via pymysql. All queries use the real schema.
 
 ### A1. 24-Month Booking Trend
 ```sql
@@ -292,10 +292,10 @@ Scan the GitHub repo for overlapping intelligence from previous initiatives.
 ### Repo Scan Pattern
 ```bash
 # List all existing artifacts
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/personas --jq '[.[] | .name]' 2>/dev/null
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/competitors --jq '[.[] | .name]' 2>/dev/null
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/decision-records --jq '[.[] | .name]' 2>/dev/null
-gh api repos/zeyad-farrag/product-engine-live/contents/initiatives/closed --jq '[.[] | .name]' 2>/dev/null
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/personas --jq '[.[] | .name]' 2>/dev/null
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/competitors --jq '[.[] | .name]' 2>/dev/null
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/decision-records --jq '[.[] | .name]' 2>/dev/null
+gh api repos/zeyad-farrag/Product-Engine/contents/initiatives/closed --jq '[.[] | .name]' 2>/dev/null
 ```
 
 ### What to Look For

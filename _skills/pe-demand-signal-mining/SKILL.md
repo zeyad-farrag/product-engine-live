@@ -7,12 +7,14 @@ description: >
   patterns, audience behavior, market demand, amendment intelligence, and hidden opportunities.
   Produces structured Demand Signal Reports persisted to the GitHub intelligence store.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: capability
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # Demand Signal Mining
 
@@ -42,7 +44,7 @@ Before running any analysis, orient yourself in the intelligence store.
 ### Step 1: Check for Existing Demand Signal Reports
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/demand-signals \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals \
   --jq '[.[] | {name: .name, path: .path}]'
 ```
 
@@ -53,7 +55,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -69,14 +71,14 @@ If reports exist, retrieve the most relevant one(s) to use as a baseline for tre
 Read the data landscape document to understand available data sources and known schema:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/09-data-landscape.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/09-data-landscape.md \
   --jq '.content' | base64 -d
 ```
 
 Also read the business model summary and segmentation model if relevant to the query focus:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/business-model-summary.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/business-model-summary.md \
   --jq '.content' | base64 -d
 ```
 
@@ -88,7 +90,7 @@ Search for persona cards, market assessments, or initiative records related to t
 
 ```bash
 # Find related artifacts by content
-gh search code "[QUERY_FOCUS]" --repo zeyad-farrag/product-engine-live
+gh search code "[QUERY_FOCUS]" --repo zeyad-farrag/Product-Engine
 ```
 
 Cross-reference findings against these related artifacts during synthesis.
@@ -97,19 +99,20 @@ Cross-reference findings against these related artifacts during synthesis.
 
 ## Database Connection
 
-Database: `system_travelapp` on `66.175.216.130`. Connection via pymysql (direct, SSL disabled).
+Database: `system_travelapp`. Connection via pymysql using environment variables.
 
 ```python
+import os
 import pymysql
 
 conn = pymysql.connect(
-    host='66.175.216.130',
-    port=3306,
-    user='root',
-    password='Flash2k1',
-    database='system_travelapp',
+    host=os.environ.get('MYSQL_HOST'),
+    port=int(os.environ.get('MYSQL_PORT', '3306')),
+    user=os.environ.get('MYSQL_USER'),
+    password=os.environ.get('MYSQL_PASSWORD'),
+    database=os.environ.get('MYSQL_DATABASE', 'system_travelapp'),
     connect_timeout=10,
-    ssl_disabled=True,
+    ssl_disabled=os.environ.get('MYSQL_SSL', 'false').lower() != 'true',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor,
 )
@@ -182,7 +185,7 @@ Examples:
 
 ```yaml
 ---
-type: demand-signal-report
+type: demand-signal
 focus: [query focus — e.g., "German bookings for Egypt packages"]
 period: [date range analyzed — e.g., "2025-01 to 2026-03"]
 data_source: mysql | manual | mixed
@@ -207,10 +210,17 @@ tags: [list of searchable tags]
 ### Commit Pattern
 
 ```bash
-cd product-engine-live
-git add artifacts/demand-signals/[filename].md
-git commit -m "Product Engine: demand-signal-report — [focus] ([period])"
-git push
+# Write artifact via GitHub Contents API (no local clone needed)
+# 1. Check if file already exists (to get SHA for update)
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals/[filename].md \
+  --jq '.sha' 2>/dev/null || echo "")
+
+# 2. Write/update the file
+echo '[report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/demand-signals/[filename].md \
+  --method PUT \
+  --field message="Product Engine: demand-signal-report — [focus] ([period])" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -223,11 +233,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

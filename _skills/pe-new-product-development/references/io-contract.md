@@ -11,7 +11,7 @@
 
 ---
 
-## Phase-Level Contracts
+## Step-Level Contracts
 
 ### Phase 0: State Detection
 
@@ -39,7 +39,7 @@ All five streams run in parallel. No recommendations — findings only.
 
 | Step | Inputs | Outputs | Feeds Into |
 |---|---|---|---|
-| 2A Demand Validation (Most Important) | **Internal signals**: MySQL: direct demand (bookings/inquiries for this product type) (pymysql direct connection to `system_travelapp`); MySQL: adjacent signals (what does this audience currently book?) (pymysql direct connection to `system_travelapp`); MySQL: amendment signals (do customers add things that would be core to this product?) (pymysql direct connection to `system_travelapp`); MySQL: negative signals (expressed demand not converted) (pymysql direct connection to `system_travelapp`) — **External validation**: Web search: market size and growth trajectory; Web search: search and social signals (trending queries, hashtags, content engagement); Web search: travel trend alignment (industry reports, booking platform data); Web search: timing and seasonality fit | Demand Validation Report: internal signal summary (direct, adjacent, amendment, negative); external signal summary with citations; **Demand Verdict** (HIGH DEMAND / MODERATE DEMAND / WEAK DEMAND / NO EVIDENCE) | IP1 Key Findings; Phase 3 product design |
+| 2A Demand Validation (Most Important) | **Internal signals**: MySQL: direct demand (bookings/inquiries for this product type) (pymysql direct connection to `system_travelapp` via env vars); MySQL: adjacent signals (what does this audience currently book?) (pymysql direct connection to `system_travelapp` via env vars); MySQL: amendment signals (do customers add things that would be core to this product?) (pymysql direct connection to `system_travelapp` via env vars); MySQL: negative signals (expressed demand not converted) (pymysql direct connection to `system_travelapp` via env vars) — **External validation**: Web search: market size and growth trajectory; Web search: search and social signals (trending queries, hashtags, content engagement); Web search: travel trend alignment (industry reports, booking platform data); Web search: timing and seasonality fit | Demand Validation Report: internal signal summary (direct, adjacent, amendment, negative); external signal summary with citations; **Demand Verdict** (HIGH DEMAND / MODERATE DEMAND / WEAK DEMAND / NO EVIDENCE) | IP1 Key Findings; Phase 3 product design |
 | 2B Audience Deep Dive | 1.3 target audience definition; existing `artifacts/personas/` < 90 days relevant to target (reuse if fresh); persona template from `references/discovery-templates.md` (includes Deal-breakers and Competitive alternatives fields) | 2–4 buyer personas; design persona identification (explicit statement of which persona to design FOR and why — not necessarily the largest segment); reuse flag if existing personas leveraged | IP1; Phase 3 positioning; Phase 4 Persona Cards |
 | 2C Competitive Whitespace Analysis | Web search: current offerings landscape; competitor profiling (Competitor / Product / Price / Positioning / Strengths / Weaknesses); `references/discovery-templates.md` whitespace methodology — Three sub-analyses: **2C-1** Current Offerings Landscape Map; **2C-2** Whitespace Identification Table (Unserved Need / Evidence / Addressable by Us / Competitive Risk); **2C-3** Differentiation Opportunities (5 dimensions: Structural / Positioning / Service / Price / Channel) | Landscape Map; Whitespace Identification Table; Differentiation Opportunities by 5 dimensions — focus: *What isn't being done well or at all that we could own?* | IP1; Phase 3 positioning and differentiation; Phase 4 Market Validation Report |
 | 2D Feasibility Assessment | `foundation/business-model-summary.md` (brand fit, portfolio context); user-stated constraints (1.2 Q5); operational knowledge | 8-dimension Feasibility Table (Destination supply / Accommodation / Activities / Transport/logistics / Pricing viability / Brand fit / Team capacity / Timeline / Cannibalization risk) each with Assessment, Constraints, Verdict; **Overall Feasibility Verdict**: FEASIBLE / FEASIBLE WITH CONSTRAINTS / NOT FEASIBLE; Cannibalization risk rating | IP1; Phase 3 impact projections; Phase 4 Market Validation Report |
@@ -118,7 +118,7 @@ Phase 1: FRAME
          ▼
 Phase 2: DISCOVER (5 parallel streams)
   ├── 2A Demand Validation ← MOST IMPORTANT (demand before design)
-  │   ├── Internal: MySQL (direct, adjacent, amendment, negative signals (pymysql direct connection to `system_travelapp`))
+  │   ├── Internal: MySQL (direct, adjacent, amendment, negative signals (pymysql direct connection to `system_travelapp` via env vars))
   │   └── External: Web search (market size, social signals, travel trends, seasonality)
   │
   ├── 2B Audience Deep Dive

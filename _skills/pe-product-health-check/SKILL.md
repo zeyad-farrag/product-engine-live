@@ -8,12 +8,14 @@ description: >
   and lifecycle assessment into a composite health score (0-100) with a STRONG/STABLE/CONCERNING/CRITICAL/TERMINAL
   classification. Persisted to the GitHub intelligence store at artifacts/health-checks/.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: capability
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # Product Health Check
 
@@ -41,7 +43,7 @@ Before running the assessment, orient yourself in the intelligence store.
 ### Step 1: Check for Existing Health Checks
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks \
   --jq '[.[] | {name: .name, path: .path}]'
 ```
 
@@ -52,7 +54,7 @@ faster retrieval:
 
 ```bash
 # Fast path — read from index (one call per artifact type)
-gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/{category}.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/{category}.md \
   --jq '.content' 2>/dev/null | base64 -d
 ```
 
@@ -64,7 +66,7 @@ approach below.
 If health checks exist for the same product, retrieve the most recent one:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/artifacts/health-checks/[filename].md \
+gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks/[filename].md \
   --jq '.content' | base64 -d
 ```
 
@@ -75,20 +77,20 @@ If the directory does not exist yet, proceed — you will create the first healt
 ### Step 2: Load Foundation Context
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/business-model-summary.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/business-model-summary.md \
   --jq '.content' | base64 -d
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/06-product-structure.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/06-product-structure.md \
   --jq '.content' | base64 -d
 ```
 
 Also read pricing policies and competitive landscape if relevant:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/10-pricing-policies.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/10-pricing-policies.md \
   --jq '.content' | base64 -d
 
-gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/07-competitive-landscape.md \
+gh api repos/zeyad-farrag/Product-Engine/contents/foundation/domains/07-competitive-landscape.md \
   --jq '.content' | base64 -d
 ```
 
@@ -98,7 +100,7 @@ gh api repos/zeyad-farrag/product-engine-live/contents/foundation/domains/07-com
 
 ```bash
 # Find demand signal reports and competitor profiles related to this product
-gh search code "[PRODUCT]" --repo zeyad-farrag/product-engine-live
+gh search code "[PRODUCT]" --repo zeyad-farrag/Product-Engine
 ```
 
 Retrieve any relevant demand signal reports or competitor profiles and cross-reference findings during synthesis.
@@ -107,19 +109,20 @@ Retrieve any relevant demand signal reports or competitor profiles and cross-ref
 
 ## Database Connection
 
-Database: `system_travelapp` on `66.175.216.130`. Connection via pymysql (direct, SSL disabled).
+Database: `system_travelapp`. Connection via pymysql using environment variables.
 
 ```python
+import os
 import pymysql
 
 conn = pymysql.connect(
-    host='66.175.216.130',
-    port=3306,
-    user='root',
-    password='Flash2k1',
-    database='system_travelapp',
+    host=os.environ.get('MYSQL_HOST'),
+    port=int(os.environ.get('MYSQL_PORT', '3306')),
+    user=os.environ.get('MYSQL_USER'),
+    password=os.environ.get('MYSQL_PASSWORD'),
+    database=os.environ.get('MYSQL_DATABASE', 'system_travelapp'),
     connect_timeout=10,
-    ssl_disabled=True,
+    ssl_disabled=os.environ.get('MYSQL_SSL', 'false').lower() != 'true',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor,
 )
@@ -201,7 +204,7 @@ Examples:
 
 ```yaml
 ---
-type: health-check
+type: destination-health-check
 product: [product name]
 health_rating: STRONG | STABLE | CONCERNING | CRITICAL | TERMINAL
 composite_score: [0-100]
@@ -232,10 +235,17 @@ tags: [list of searchable tags]
 ### Commit Pattern
 
 ```bash
-cd product-engine-live
-git add artifacts/health-checks/[filename].md
-git commit -m "Product Engine: health-check — [PRODUCT] ([date])"
-git push
+# Write artifact via GitHub Contents API (no local clone needed)
+# 1. Check if file already exists (to get SHA for update)
+EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks/[filename].md \
+  --jq '.sha' 2>/dev/null || echo "")
+
+# 2. Write/update the file
+echo '[report content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/artifacts/health-checks/[filename].md \
+  --method PUT \
+  --field message="Product Engine: health-check — [PRODUCT] ([date])" \
+  --field content=@- \
+  ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
 ```
 
 ### Update Memory Index
@@ -248,11 +258,16 @@ After committing artifacts, update the relevant index file(s) at
 3. If not, append a new row with: Path, Subject, Markets, Destinations,
    Updated, Author, Confidence, Status, Session, Depends On
 4. Update `artifact_count` and `updated` in the index frontmatter
-5. Commit and push:
+5. Write the updated index via GitHub Contents API:
    ```bash
-   git add intelligence/_index/[relevant-index].md
-   git commit -m "Product Engine: update [category] index"
-   git push
+   EXISTING_SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --jq '.sha' 2>/dev/null || echo "")
+
+   echo '[updated index content]' | base64 -w0 | gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/[relevant-index].md \
+     --method PUT \
+     --field message="Product Engine: update [category] index" \
+     --field content=@- \
+     ${EXISTING_SHA:+--field sha="$EXISTING_SHA"}
    ```
 
 If the index file does not exist yet, skip this step — pe-memory-maintenance

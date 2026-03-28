@@ -4,10 +4,10 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | User-specified context (market, product, or audience); GitHub repo `zeyad-farrag/product-engine-live` accessible |
+| **Required Inputs** | User-specified context (market, product, or audience); GitHub repo `zeyad-farrag/Product-Engine` accessible |
 | **Optional Inputs** | `foundation/domains/04-source-markets.md`, `foundation/domains/05-customer-segmentation.md`, `foundation/domains/03-destination-portfolio.md`, `foundation/domains/06-product-structure.md`, `foundation/domains/10-pricing-policies.md`; existing persona cards in `artifacts/personas/`; MySQL booking data |
 | **Produces** | Persona card files at `artifacts/personas/[kebab-case-name].md`; portfolio summary at `artifacts/personas/[context]-portfolio-summary.md` |
-| **Updates** | `intelligence/_index/[personas-index].md` |
+| **Updates** | `intelligence/_index/personas.md` |
 
 ---
 
@@ -17,8 +17,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | GitHub repo `zeyad-farrag/product-engine-live`; local workspace `/home/user/workspace` |
-| **Outputs** | Cloned or pulled repo at `/home/user/workspace/product-engine-live`; index file(s) at `intelligence/_index/{category}.md` (attempted fast-path read) |
+| **Inputs** | GitHub repo `zeyad-farrag/Product-Engine`; local workspace `/home/user/workspace` |
+| **Outputs** | Cloned or pulled repo at `/home/user/workspace/Product-Engine`; index file(s) at `intelligence/_index/{category}.md` (attempted fast-path read) |
 | **Feeds Into** | Step 1 (context check) |
 
 ---
@@ -37,7 +37,7 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | MySQL (pymysql direct connection): booking patterns by nationality — `operation_files`, `requests`, `clients`, `countries`, `acc_srv_orders`, `acc_srv_orders_operation_files`, `destinations`, `sources` tables; Web search: `[market] travelers Egypt tours preferences`, `[market] outbound travel behavior`, `[market] travel booking channels`, `[market] luxury/budget travel trends` |
+| **Inputs** | MySQL (pymysql direct connection via env vars): booking patterns by nationality — `operation_files`, `requests`, `clients`, `countries`, `acc_srv_orders`, `acc_srv_orders_operation_files`, `destinations`, `sources` tables; Web search: `[market] travelers Egypt tours preferences`, `[market] outbound travel behavior`, `[market] travel booking channels`, `[market] luxury/budget travel trends` |
 | **Outputs** | Booking pattern data (nationality, avg value, lead time, group size); product/tier preference breakdown; price band clusters; amendment frequency by type; channel split; repeat/LTV data; external research findings on motivations, booking journey, cultural factors, price sensitivity, content channels |
 | **Feeds Into** | Step 3 (combined internal + external data drives persona identification) |
 
@@ -77,8 +77,8 @@
 
 | Field | Details |
 |---|---|
-| **Inputs** | Persona card drafts from Step 4; portfolio summary from Step 5; existing `artifacts/personas/` (cross-reference check before writing); `intelligence/_index/[personas-index].md` (current index content) |
-| **Outputs** | `artifacts/personas/[kebab-case-name].md` per persona (YAML frontmatter: type, name, market, segment, destinations, confidence, status, initiative, tags); `artifacts/personas/[context]-portfolio-summary.md`; updated `intelligence/_index/[personas-index].md` |
+| **Inputs** | Persona card drafts from Step 4; portfolio summary from Step 5; existing `artifacts/personas/` (cross-reference check before writing); `intelligence/_index/personas.md` (current index content) |
+| **Outputs** | `artifacts/personas/[kebab-case-name].md` per persona (YAML frontmatter: type, name, market, segment, destinations, confidence, status, initiative, tags); `artifacts/personas/[context]-portfolio-summary.md`; updated `intelligence/_index/personas.md` |
 | **Feeds Into** | Step 7 (memory pointer references committed paths) |
 
 ---
@@ -134,4 +134,4 @@ Step 7: Memory Pointer
 |---|---|---|---|
 | Persona card | `artifacts/personas/[kebab-case-name].md` | `persona-card` | MySQL booking data, web research, foundation domains 04/05/06/10 |
 | Portfolio summary | `artifacts/personas/[context]-portfolio-summary.md` | _(inline in file)_ | All persona cards for this context |
-| Persona index | `intelligence/_index/[personas-index].md` | _(index table)_ | All persona cards |
+| Persona index | `intelligence/_index/personas.md` | _(index table)_ | All persona cards |

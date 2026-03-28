@@ -11,12 +11,14 @@ description: >
   assessment, staleness flags, and coverage gap identification. Read-only —
   does not write artifacts. Points to specific pe-* skills for filling gaps.
 metadata:
+  author: Product Engine
+  version: '1.0'
   layer: memory
   system: product-engine
-  repo: zeyad-farrag/product-engine-live
+  repo: zeyad-farrag/Product-Engine
 ---
 
-> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/product-engine-live`
+> **Repository Path**: Read from `_config/repo.md`. Current: `zeyad-farrag/Product-Engine`
 
 # pe-memory-query
 
@@ -44,7 +46,7 @@ Read all 10 index files simultaneously using `gh` CLI with `api_credentials=["gi
 for idx in personas competitors demand-signals health-checks gap-analyses \
            market-assessments decision-records initiatives intelligence-reports foundation; do
   echo "=== $idx ===" && \
-  gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/${idx}.md \
+  gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/${idx}.md \
     --jq '.content' 2>/dev/null | base64 -d
 done
 ```
@@ -95,7 +97,7 @@ Collect all matching rows with their full metadata (path, subject, markets, dest
 For each matching path, fetch the full artifact:
 
 ```bash
-gh api repos/zeyad-farrag/product-engine-live/contents/[path] \
+gh api repos/zeyad-farrag/Product-Engine/contents/[path] \
   --jq '.content' | base64 -d
 ```
 
@@ -177,12 +179,12 @@ If none: "No stale intelligence found for this query."
 - No [type] found for [query subject] — consider running `[pe-skill]`
 
 Gap-to-skill mapping:
-- No personas → run `pe-persona-builder`
+- No personas → run `pe-persona-definition`
 - No competitor profiles → run `pe-competitor-benchmarking`
 - No demand signals → run `pe-demand-signal-mining`
-- No health checks → run `pe-health-check`
+- No health checks → run `pe-product-health-check`
 - No gap analyses → run `pe-gap-analysis`
-- No market assessments → run `pe-market-assessment`
+- No market assessments → run `pe-market-entry`
 - No decision records → [decisions haven't been logged yet]
 
 ### Dependency Map

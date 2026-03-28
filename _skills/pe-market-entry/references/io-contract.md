@@ -11,7 +11,7 @@
 
 ---
 
-## Phase-Level Contracts
+## Step-Level Contracts
 
 ### Phase 0: State Detection
 
@@ -47,7 +47,7 @@
 
 | Step | Inputs | Outputs | Feeds Into |
 |---|---|---|---|
-| 2A Internal Demand Signal Mining | MySQL: 24-month booking trend by source market (pymysql direct connection to `system_travelapp`); MySQL: destination breakdown (pymysql direct connection to `system_travelapp`); MySQL: product type mix, avg booking value, lead time, group size, seasonality, traffic, amendment rates (pymysql direct connection to `system_travelapp`) | Internal demand signal report: booking volumes, trends, seasonality patterns, traffic metrics; confidence label (FACT/INFERENCE/ASSUMPTION) per finding | Inflection Point 1 Evidence Summary |
+| 2A Internal Demand Signal Mining | MySQL: 24-month booking trend by source market (pymysql direct connection to `system_travelapp` via env vars); MySQL: destination breakdown (pymysql direct connection to `system_travelapp` via env vars); MySQL: product type mix, avg booking value, lead time, group size, seasonality, traffic, amendment rates (pymysql direct connection to `system_travelapp` via env vars) | Internal demand signal report: booking volumes, trends, seasonality patterns, traffic metrics; confidence label (FACT/INFERENCE/ASSUMPTION) per finding | Inflection Point 1 Evidence Summary |
 | 2B External Market Intelligence | Web search: outbound travel market size + growth for target market; Web search: travel behaviour patterns (booking lead time, trip duration, spend); Web search: structural factors (visa regimes, flight connectivity, currency, language, culture); Web search: digital landscape (platforms, search volume); Web search: regulatory/risk factors | External market intelligence report with citations and publication dates; FACT/INFERENCE/ASSUMPTION labels | Inflection Point 1 Evidence Summary |
 | 2C Competitor Landscape Analysis | Web search: direct, indirect, and local competitors serving target market; 9-dimension profiling matrix (price, itinerary length, activities, accommodation tier, USPs, source market focus, booking flexibility, digital presence/ratings, amendment/cancellation policies) | Competitor profile per competitor; competitive gap analysis (what competitors do well, poorly, and gap nobody covers) | Inflection Point 1 Evidence Summary; Phase 4 Competitor Benchmark artifacts |
 | 2D Buyer Persona Discovery | Web search + industry data: 12-dimension persona template per segment; existing `artifacts/personas/` < 90 days (reuse if fresh); Stream 2A internal demand cross-validation | 2–5 persona profiles; audience match assessment; reuse flag if existing personas leveraged | Inflection Point 1 Evidence Summary; Phase 4 Persona Card artifacts |

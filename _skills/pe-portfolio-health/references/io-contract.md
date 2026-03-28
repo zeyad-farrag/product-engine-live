@@ -152,4 +152,4 @@ Step 3 ──► Step 8: Trend Comparison (prior portfolio-health report)
 | Artifact | Path Pattern | Frontmatter Type | Depends On |
 |---|---|---|---|
 | Portfolio Health Dashboard | `intelligence/portfolio-health/YYYY-MM-DD.md` | `portfolio-health` | health-checks, demand-signals, market-assessments, gap-analyses, decision-records, competitors, personas, initiatives |
-| Intelligence Index (portfolio-health) | `intelligence/_index/portfolio-health.md` | index | Portfolio Health Dashboard |
+| Intelligence Index (portfolio-health) | `intelligence/_index/intelligence-reports.md` | index | Portfolio Health Dashboard |

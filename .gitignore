@@ -1,14 +1,24 @@
-# OS
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+.mcp.json
+
+# OS Files
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Editor
+# Editors
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
-.vscode/
-.idea/
 
-# Node (dashboard if deployed here)
+# Node (for npx mcp-remote)
 node_modules/
-dist/
+
+# Temporary
+/tmp/
+*.log

@@ -4,7 +4,7 @@
 
 | | Details |
 |---|---|
-| **Required Inputs** | User's natural language query; GitHub repo access (`zeyad-farrag/product-engine-live`) |
+| **Required Inputs** | User's natural language query; GitHub repo access (`zeyad-farrag/Product-Engine`) |
 | **Optional Inputs** | All 10 index files at `intelligence/_index/` (accelerates retrieval; skill falls back to directory scanning if absent) |
 | **Produces** | Structured synthesis response (conversational output only — **not persisted**) |
 | **Updates** | Nothing — this skill is strictly read-only |
@@ -117,4 +117,4 @@ Step 3: Filter Index Rows ◄─────────────────
 - **Prerequisite**: pe-foundation-session must have run before this skill has useful data to query.
 - **Index dependency**: the skill is fastest with all 10 index files present; it degrades gracefully to directory scanning otherwise.
 - **Staleness detection**: flags artifacts updated >90 days ago (time-stale) or whose dependencies were updated after them (dependency-stale) — but does not fix them. Use pe-memory-maintenance to address staleness.
-- **Gap-to-skill mapping**: no-persona gaps → `pe-persona-builder`; no competitors → `pe-competitor-benchmarking`; no demand signals → `pe-demand-signal-mining`; no health checks → `pe-health-check`; no gap analyses → `pe-gap-analysis`; no market assessments → `pe-market-assessment`.
+- **Gap-to-skill mapping**: no-persona gaps → `pe-persona-definition`; no competitors → `pe-competitor-benchmarking`; no demand signals → `pe-demand-signal-mining`; no health checks → `pe-product-health-check`; no gap analyses → `pe-gap-analysis`; no market assessments → `pe-market-entry`.

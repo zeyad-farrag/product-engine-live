@@ -78,7 +78,7 @@ Rate the depth and quality of information gathered for each domain:
 After all files are committed to the repo, present a confirmation listing every file written:
 
 ```
-Repository Commit Confirmation (zeyad-farrag/product-engine-live):
+Repository Commit Confirmation (zeyad-farrag/Product-Engine):
 
 Foundation Domains:
 ✓ foundation/domains/01-company-identity.md

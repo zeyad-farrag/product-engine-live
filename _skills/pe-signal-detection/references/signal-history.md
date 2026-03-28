@@ -82,7 +82,7 @@ Signal History: RECURRING x [N] | First seen: [date] | Last escalation: [reason 
 Escalation note: "This signal has appeared in [N] consecutive reports.
 No active initiative found in initiatives/active/ to address it.
 Severity auto-escalated from [prior] to [current].
-Recommended: Log a formal decision (run pe-decision-record) or create an initiative."
+Recommended: Log a formal decision (create a decision record manually) or create an initiative."
 ```
 
 ---

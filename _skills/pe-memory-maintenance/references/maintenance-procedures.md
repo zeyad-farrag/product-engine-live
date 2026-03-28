@@ -151,10 +151,10 @@ DETECT_DEPENDENCY_STALENESS(all_artifacts):
 | Artifact Directory | Skill to Suggest |
 |---|---|
 | `artifacts/gap-analyses/` | `pe-gap-analysis` |
-| `artifacts/health-checks/` | `pe-health-check` |
-| `artifacts/market-assessments/` | `pe-market-assessment` |
-| `artifacts/decision-records/` | `pe-decision-record` |
-| `artifacts/competitors/` | `pe-competitor-analysis` |
+| `artifacts/health-checks/` | `pe-product-health-check` |
+| `artifacts/market-assessments/` | `pe-market-entry` |
+| `artifacts/decision-records/` | manually created (no generating skill) |
+| `artifacts/competitors/` | `pe-competitor-benchmarking` |
 | `artifacts/demand-signals/` | `pe-signal-detection` |
 | `intelligence/cross-initiative-patterns/` | `pe-cross-initiative-patterns` |
 | `intelligence/portfolio-health/` | `pe-cross-initiative-patterns` |
@@ -375,7 +375,7 @@ COMPETITOR CONSOLIDATION: Intrepid Travel
   Profiles: artifacts/competitors/intrepid-australia.md,
             artifacts/competitors/intrepid-egypt.md,
             artifacts/competitors/intrepid-jordan.md
-  → Run pe-competitor-analysis with "create canonical profile" mode
+  → Run pe-competitor-benchmarking with "create canonical profile" mode
 ```
 
 ### Pattern 2: Persona Archetype Elevation
@@ -458,7 +458,7 @@ Present all consolidation suggestions in one table after pattern detection:
 ```
 | Pattern | Subject | Count | Paths | Suggested Action |
 |---|---|---|---|---|
-| Competitor Consolidation | Intrepid Travel | 3 | [list] | pe-competitor-analysis (canonical) |
+| Competitor Consolidation | Intrepid Travel | 3 | [list] | pe-competitor-benchmarking (canonical) |
 | Archetype Elevation | Leisure Traveler | 4 markets | [list] | pe-cross-initiative-patterns |
 | Signal Consolidation | Germany→Egypt Q1 2026 | 2 | [list] | pe-signal-detection (quarterly) |
 | Contradictory Decisions | Germany Timing | 2 | [list] | Human review |
@@ -546,7 +546,7 @@ All writes go through the GitHub Contents API (no local clone required).
 ### Single Index Update (after incremental changes)
 ```bash
 # Get current SHA
-SHA=$(gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/<file>.md \
+SHA=$(gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/<file>.md \
   --jq '.sha' 2>/dev/null)
 
 # Encode content
@@ -554,13 +554,13 @@ ENCODED=$(echo "$CONTENT" | base64 -w0)
 
 # Update or create
 if [ -n "$SHA" ]; then
-  gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/<file>.md \
+  gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/<file>.md \
     -X PUT \
     -f message="Product Engine: update <category> index" \
     -f content="$ENCODED" \
     -f sha="$SHA"
 else
-  gh api repos/zeyad-farrag/product-engine-live/contents/intelligence/_index/<file>.md \
+  gh api repos/zeyad-farrag/Product-Engine/contents/intelligence/_index/<file>.md \
     -X PUT \
     -f message="Product Engine: create <category> index" \
     -f content="$ENCODED"
